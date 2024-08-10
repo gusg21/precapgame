@@ -1,0 +1,39 @@
+[gd_scene load_steps=8 format=3 uid="uid://i1yrygt6eicc"]
+
+[ext_resource type="PackedScene" uid="uid://djqq4ipexojpl" path="res://block/block.tscn" id="1_ar0ab"]
+[ext_resource type="Texture2D" uid="uid://bps3qkbq2wpw0" path="res://bg/tetris_bg.png" id="2_aomdg"]
+[ext_resource type="Script" path="res://utils/scroller.gd" id="3_cdk7q"]
+[ext_resource type="Script" path="res://grid/grid.gd" id="4_sxwvi"]
+[ext_resource type="Texture2D" uid="uid://cd71717iixwi8" path="res://grid/empty_grid_tile.png" id="5_ffhhw"]
+[ext_resource type="PackedScene" uid="uid://dmci70rf5h6p" path="res://grid/grid_bg.tscn" id="6_8xisf"]
+[ext_resource type="Script" path="res://blockspawner/block_spawner.gd" id="7_qjl1v"]
+
+[node name="Main" type="Node2D"]
+
+[node name="BGLayer" type="CanvasLayer" parent="."]
+layer = 0
+follow_viewport_enabled = true
+follow_viewport_scale = 0.5
+
+[node name="BG" type="Sprite2D" parent="BGLayer"]
+texture = ExtResource("2_aomdg")
+region_enabled = true
+region_rect = Rect2(0, 0, 2000, 2000)
+script = ExtResource("3_cdk7q")
+speed = 4.0
+
+[node name="GameplayLayer" type="CanvasLayer" parent="."]
+follow_viewport_enabled = true
+
+[node name="Camera2D" type="Camera2D" parent="GameplayLayer"]
+
+[node name="Grid" type="Node2D" parent="GameplayLayer"]
+z_index = -1
+script = ExtResource("4_sxwvi")
+empty_grid_tile_tex = ExtResource("5_ffhhw")
+grid_bg_scene = ExtResource("6_8xisf")
+
+[node name="BlockSpawner" type="Node2D" parent="GameplayLayer"]
+script = ExtResource("7_qjl1v")
+block_scene = ExtResource("1_ar0ab")
+block_strings = Array[String](["10@@@,_@"])
