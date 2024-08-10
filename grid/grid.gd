@@ -7,6 +7,7 @@ class_name Grid
 @export var grid_bg_scene: PackedScene
 
 var tiles: Dictionary = {}
+var letter_tiles: Dictionary = {}
 
 
 func _enter_tree():
@@ -25,8 +26,17 @@ func _ready():
 				y - GameMaster.GRID_HEIGHT / 2
 				) * grid_spacing
 			add_child(grid_tile)
-			
 			tiles[Vector2i(x, y)] = grid_tile
+			
+			var letter_tile = Sprite2D.new()
+			letter_tile.texture = null
+			letter_tile.centered = false
+			letter_tile.position = Vector2i(
+				x - GameMaster.GRID_WIDTH / 2, 
+				y - GameMaster.GRID_HEIGHT / 2
+				) * grid_spacing
+			add_child(letter_tile)
+			letter_tiles[Vector2i(x, y)] = letter_tile
 			
 	var bg = grid_bg_scene.instantiate()
 	bg = bg as NinePatchRect
@@ -40,7 +50,9 @@ func _ready():
 
 func on_grid_changed(tile_pos: Vector2i):
 	if tile_pos in tiles.keys():
-		tiles[tile_pos].texture = GameMaster.get_tile_at(tile_pos).texture
+		var tile_data = GameMaster.get_tile_at(tile_pos)
+		tiles[tile_pos].texture = tile_data.texture
+		letter_tiles[tile_pos].texture = GameMaster.get_letter_texture(tile_data.letter)
 
 func get_global_position_from_tile_pos(tile_pos: Vector2i) -> Vector2:
 	return Vector2(

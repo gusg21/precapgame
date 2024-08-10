@@ -12,13 +12,14 @@ var tile_pos: Vector2i
 var graphics: Array[Node]
 var letter_offsets: Dictionary
 
+
 signal block_placed
 
 func _ready():
 	block_tile_offsets = parse_block_tile_offsets_from_block_string(block_string)
 	
 	for offset in block_tile_offsets:
-		letter_offsets[offset] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[randi_range(0, 25)]
+		letter_offsets[offset] = GameMaster.get_random_weighted_letter()
 	generate_graphics(block_tile_offsets, letter_offsets)
 	
 	GameMaster.tile_move_down.connect(on_tile_move_down)
@@ -112,10 +113,7 @@ func generate_graphics(block_tile_offsets, letter_offsets):
 		
 	for letter_offset in letter_offsets.keys():
 		var letter_sprite = Sprite2D.new()
-		letter_sprite.texture = AtlasTexture.new()
-		letter_sprite.texture.atlas = preload("res://block/letters.png")
-		var letter_index = letter_offsets[letter_offset].to_upper().to_ascii_buffer()[0] - "A".to_ascii_buffer()[0]
-		letter_sprite.texture.region = Rect2((letter_index % 8) * 8, (letter_index / 8) * 8, 8, 8)
+		letter_sprite.texture = GameMaster.get_letter_texture(letter_offsets[letter_offset])
 		letter_sprite.centered = false
 		letter_sprite.position = letter_offset * BLOCK_SIZE
 		add_child(letter_sprite)
@@ -163,7 +161,7 @@ func place_self():
 		GameMaster.place_tile(tile_pos, {
 			solid = true,
 			texture = block_texture,
-			letter = null
+			letter = letter_offsets[offset]
 		})
 		
 	block_placed.emit()

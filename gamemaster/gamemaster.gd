@@ -4,6 +4,35 @@ const GRID_WIDTH = 10
 const GRID_HEIGHT = 20
 const TILE_MOVE_DOWN_SECS: float = 1
 
+var LETTER_FREQUENCIES: Dictionary = {
+	"A" = 7.8,
+	"B" = 2.0,
+	"C" = 4.0,
+	"D" = 3.8,
+	"E" = 11.0,
+	"F" = 1.4,
+	"G" = 3.0,
+	"H" = 2.3,
+	"I" = 8.6,
+	"J" = 0.2,
+	"K" = 0.9,
+	"L" = 5.3,
+	"M" = 2.7,
+	"N" = 7.2,
+	"O" = 6.1,
+	"P" = 2.8,
+	"Q" = 0.2,
+	"R" = 7.3,
+	"S" = 8.7,
+	"T" = 6.7,
+	"U" = 3.3,
+	"V" = 1.0,
+	"W" = 0.9,
+	"X" = 0.3,
+	"Y" = 1.6,
+	"Z" = 0.4
+}
+
 var grid_object: Grid
 var block_spawner: BlockSpawner
 
@@ -18,6 +47,9 @@ signal grid_changed(tile_pos: Vector2i)
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	randomize()
+	
+	for letter in LETTER_FREQUENCIES.keys():
+		LETTER_FREQUENCIES[letter] = pow(LETTER_FREQUENCIES[letter], 1.5)
 	
 	for x in range(GRID_WIDTH):
 		for y in range(GRID_HEIGHT):
@@ -37,6 +69,18 @@ func _ready():
 	
 	falling_block = block_spawner.spawn_random_block()
 	falling_block.block_placed.connect(on_block_placed)
+
+func get_random_weighted_letter() -> String:
+	var weight_sum = 0 
+	for weight in LETTER_FREQUENCIES.values():
+		weight_sum += weight
+	var random_index = randf_range(0, weight_sum)
+	for letter in LETTER_FREQUENCIES.keys():
+		if random_index < LETTER_FREQUENCIES[letter]:
+			return letter
+		random_index -= LETTER_FREQUENCIES[letter]
+	printerr("Random letter algo error, returning E")
+	return "E"
 
 func on_block_placed():
 	falling_block.block_placed.disconnect(on_block_placed)
@@ -72,6 +116,13 @@ func get_tile_at(tile_pos):
 		return grid[tile_pos]
 	else:
 		return null
+		
+func get_letter_texture(letter: String) -> Texture2D:
+	var texture = AtlasTexture.new()
+	texture.atlas = preload("res://block/letters.png")
+	var letter_index = letter.to_upper().to_ascii_buffer()[0] - "A".to_ascii_buffer()[0]
+	texture.region = Rect2((letter_index % 8) * 8, (letter_index / 8) * 8, 8, 8)
+	return texture
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _physics_process(delta):
