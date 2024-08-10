@@ -1,9 +1,10 @@
-[gd_scene load_steps=22 format=3 uid="uid://i1yrygt6eicc"]
+[gd_scene load_steps=33 format=3 uid="uid://i1yrygt6eicc"]
 
 [ext_resource type="PackedScene" uid="uid://djqq4ipexojpl" path="res://block/block.tscn" id="1_ar0ab"]
 [ext_resource type="Texture2D" uid="uid://bps3qkbq2wpw0" path="res://bg/tetris_bg.png" id="2_aomdg"]
 [ext_resource type="Script" path="res://utils/scroller.gd" id="3_cdk7q"]
 [ext_resource type="Script" path="res://bg/bg_changer.gd" id="3_se670"]
+[ext_resource type="Script" path="res://camera/camera.gd" id="4_pej62"]
 [ext_resource type="Script" path="res://grid/grid.gd" id="4_sxwvi"]
 [ext_resource type="Texture2D" uid="uid://cd71717iixwi8" path="res://grid/empty_grid_tile.png" id="5_ffhhw"]
 [ext_resource type="PackedScene" uid="uid://dmci70rf5h6p" path="res://grid/grid_bg.tscn" id="6_8xisf"]
@@ -14,6 +15,16 @@
 [ext_resource type="Texture2D" uid="uid://ddto2bhydudnw" path="res://block/tiles.png" id="8_xqimb"]
 [ext_resource type="Script" path="res://turntimer/turn_timer.gd" id="11_lnhbx"]
 [ext_resource type="Texture2D" uid="uid://bm1epgampw52d" path="res://turntimer/turn_timer_pip.png" id="12_eerp2"]
+[ext_resource type="FontFile" uid="uid://j56501frjq6j" path="res://Mystery Font.ttf" id="15_2a34e"]
+[ext_resource type="Script" path="res://grid/selection_display.gd" id="16_bbo1j"]
+[ext_resource type="Texture2D" uid="uid://evgm56wg5ua0" path="res://grid/x.png" id="17_c6rs2"]
+[ext_resource type="Script" path="res://grid/skip_word_search.gd" id="18_mg6el"]
+[ext_resource type="PackedScene" uid="uid://j5vy5ku43jo2" path="res://grid/bomb_slot.tscn" id="20_brpe1"]
+[ext_resource type="Texture2D" uid="uid://cpfmucd44ukna" path="res://grid/basic_bomb.png" id="21_tu23d"]
+[ext_resource type="Texture2D" uid="uid://1x6636j5nocq" path="res://grid/super_bomb.png" id="22_b0fk7"]
+[ext_resource type="Texture2D" uid="uid://d4dyywfa5jafi" path="res://grid/ultra_bomb.png" id="23_eqr6w"]
+[ext_resource type="Texture2D" uid="uid://cybgqde3reurd" path="res://grid/master_bomb.png" id="24_b5u6k"]
+[ext_resource type="Script" path="res://grid/cancel_bomb.gd" id="25_pklp7"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_q1spn"]
 atlas = ExtResource("8_xqimb")
@@ -64,6 +75,7 @@ bg_node_path = NodePath("../BG")
 follow_viewport_enabled = true
 
 [node name="Camera2D" type="Camera2D" parent="GameplayLayer"]
+script = ExtResource("4_pej62")
 
 [node name="Grid" type="Node2D" parent="GameplayLayer"]
 z_index = -1
@@ -130,3 +142,57 @@ texture = ExtResource("12_eerp2")
 [node name="TurnTimerPip9" type="Sprite2D" parent="GameplayLayer/TurnTimer"]
 position = Vector2(69, 48)
 texture = ExtResource("12_eerp2")
+
+[node name="SelectionDisplay" type="Label" parent="GameplayLayer"]
+offset_left = 65.0
+offset_top = -80.0
+offset_right = 209.0
+offset_bottom = -57.0
+theme_override_fonts/font = ExtResource("15_2a34e")
+theme_override_font_sizes/font_size = 7
+text = "HELLO WORLD"
+vertical_alignment = 1
+script = ExtResource("16_bbo1j")
+
+[node name="ValidWord" type="Sprite2D" parent="GameplayLayer/SelectionDisplay"]
+position = Vector2(-9, 11)
+texture = ExtResource("17_c6rs2")
+
+[node name="Button" type="Button" parent="GameplayLayer"]
+offset_left = 64.0
+offset_top = 60.0
+offset_right = 72.0
+offset_bottom = 68.0
+theme_override_fonts/font = ExtResource("15_2a34e")
+theme_override_font_sizes/font_size = 7
+text = "SKIP WORD SEARCH"
+script = ExtResource("18_mg6el")
+
+[node name="BasicSlot" parent="GameplayLayer" instance=ExtResource("20_brpe1")]
+position = Vector2(-72, -37)
+bomb_texture = ExtResource("21_tu23d")
+
+[node name="BasicSlot2" parent="GameplayLayer" instance=ExtResource("20_brpe1")]
+position = Vector2(-72, -15)
+bomb_type = 1
+bomb_texture = ExtResource("22_b0fk7")
+
+[node name="BasicSlot3" parent="GameplayLayer" instance=ExtResource("20_brpe1")]
+position = Vector2(-72, 7)
+bomb_type = 2
+bomb_texture = ExtResource("23_eqr6w")
+
+[node name="BasicSlot4" parent="GameplayLayer" instance=ExtResource("20_brpe1")]
+position = Vector2(-72, 29)
+bomb_type = 3
+bomb_texture = ExtResource("24_b5u6k")
+
+[node name="CancelBomb" type="Button" parent="GameplayLayer"]
+offset_left = -146.0
+offset_top = 44.0
+offset_right = -61.0
+offset_bottom = 60.0
+theme_override_fonts/font = ExtResource("15_2a34e")
+theme_override_font_sizes/font_size = 7
+text = "CANCEL BOMB"
+script = ExtResource("25_pklp7")

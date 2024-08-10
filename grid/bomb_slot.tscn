@@ -1,0 +1,44 @@
+[gd_scene load_steps=6 format=3 uid="uid://j5vy5ku43jo2"]
+
+[ext_resource type="Texture2D" uid="uid://di1o470wr8g4h" path="res://grid/bomb_slot.png" id="1_pedxn"]
+[ext_resource type="Script" path="res://grid/bomb_slot.gd" id="2_ytbxn"]
+[ext_resource type="Texture2D" uid="uid://cpfmucd44ukna" path="res://grid/basic_bomb.png" id="3_711ru"]
+[ext_resource type="FontFile" uid="uid://j56501frjq6j" path="res://Mystery Font.ttf" id="4_lk33n"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_31mpu"]
+
+[node name="BasicSlot" type="Sprite2D"]
+texture = ExtResource("1_pedxn")
+script = ExtResource("2_ytbxn")
+
+[node name="BasicBomb" type="Sprite2D" parent="."]
+texture = ExtResource("3_711ru")
+
+[node name="Count" type="Label" parent="."]
+offset_left = -77.0
+offset_top = -11.0
+offset_right = -11.0
+offset_bottom = 12.0
+theme_override_fonts/font = ExtResource("4_lk33n")
+theme_override_font_sizes/font_size = 7
+text = "0
+"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="BombLabel" type="Label" parent="."]
+z_index = 10
+offset_left = -33.0
+offset_top = -31.0
+offset_right = 33.0
+offset_bottom = -8.0
+theme_override_fonts/font = ExtResource("4_lk33n")
+theme_override_font_sizes/font_size = 7
+text = "HELLO"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CircleShape2D_31mpu")

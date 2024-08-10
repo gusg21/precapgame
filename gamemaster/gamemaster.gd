@@ -4,10 +4,18 @@ enum GameMode {
 	TETRIS, WORDSEARCH
 }
 
+enum Direction {
+	VERTICAL, HORIZONTAL, DIAGONAL
+}
+
+enum BombType {
+	NORMAL, SUPER, ULTRA, MASTER
+}
+
 const GRID_WIDTH = 10
 const GRID_HEIGHT = 20
 const TILE_MOVE_DOWN_SECS: float = 1
-const MAX_TETRIS_TURN_COUNT = 2
+const MAX_TETRIS_TURN_COUNT = 5
 const MAX_WORDSEARCH_TURN_COUNT = 5
 
 var LETTER_FREQUENCIES: Dictionary = {
@@ -41,6 +49,7 @@ var LETTER_FREQUENCIES: Dictionary = {
 
 var grid_object: Grid
 var block_spawner: BlockSpawner
+var camera: Camera
 
 var grid: Dictionary
 var tile_move_down_timer: Timer # block move down timer. bad name :(
@@ -51,6 +60,16 @@ var mode: GameMode = GameMode.TETRIS
 var selecting: bool = false
 var selection_begin: Vector2i = Vector2i.ZERO
 var selection_end: Vector2i = Vector2i.ZERO
+var selection_direction: Direction = Direction.VERTICAL
+var words: Array = []
+var bomb_count: Dictionary = {
+	BombType.NORMAL: 0,
+	BombType.SUPER: 0,
+	BombType.ULTRA: 0,
+	BombType.MASTER: 0
+}
+var bomb_placing: bool = false
+var bomb_placing_type: BombType = BombType.NORMAL
 
 signal tile_move_down
 signal grid_changed(tile_pos: Vector2i)
@@ -59,6 +78,9 @@ signal mode_changed(mode: GameMode)
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	randomize()
+	
+	var words_file = FileAccess.open("res://utils/words_alpha.txt", FileAccess.READ)
+	words = words_file.get_as_text().split("\n")
 	
 	for letter in LETTER_FREQUENCIES.keys():
 		LETTER_FREQUENCIES[letter] = pow(LETTER_FREQUENCIES[letter], 1.5)
@@ -99,26 +121,123 @@ func get_random_weighted_letter() -> String:
 	printerr("Random letter algo error, returning E")
 	return "E"
 
+func begin_bomb_placing(bomb_type: BombType):
+	bomb_placing = true
+	bomb_placing_type = bomb_type
+
+func is_bomb_placing() -> bool:
+	return bomb_placing
+
+func cancel_bomb():
+	bomb_placing = false
+
+func do_bomb_at(tile_pos: Vector2):
+	var size = 3
+	if bomb_placing_type == BombType.NORMAL:
+		size = 3
+	elif bomb_placing_type == BombType.SUPER:
+		size = 5
+	elif bomb_placing_type == BombType.ULTRA:
+		size = 7
+	elif bomb_placing_type == BombType.MASTER:
+		size = 9
+	
+	for x in range(size):
+		for y in range(size):
+			var pos = Vector2i(
+				tile_pos.x + x - size / 2,
+				tile_pos.y + y - size / 2
+			)
+			grid[pos] = {
+				solid = false,
+				texture = null,
+				letter = null
+			}
+			grid_changed.emit(pos)
+	
+	camera.shake(0.1 * size)
+	
+	bomb_count[bomb_placing_type] -= 1
+	bomb_placing = false
+
 func on_block_placed():
-	turn_counter -= 1
 	falling_block.block_placed.disconnect(on_block_placed)
 	last_down_press_time = 0 # "hack" to make sure next block doesn't come careening down
 	
-	if turn_counter > 0:
+	var solid_row_streak = 0
+	var block_rows = []
+	for offset in falling_block.block_tile_offsets:
+		var row = falling_block.tile_pos.y + offset.y
+		if row not in block_rows:
+			block_rows.append(row)
+	for row in block_rows:
+		var solid_row = true
+		for col in range(GRID_WIDTH):
+			if !grid[Vector2i(col, row)].solid:
+				solid_row = false
+				break
+		if solid_row:
+			solid_row_streak += 1
+		else:
+			if solid_row_streak == 1:
+				bomb_count[BombType.NORMAL] += 1
+			elif solid_row_streak == 2:
+				bomb_count[BombType.SUPER] += 1
+			elif solid_row_streak == 3:
+				bomb_count[BombType.ULTRA] += 1
+			elif solid_row_streak == 4:
+				bomb_count[BombType.MASTER] += 1
+			
+			solid_row_streak = 0
+			
+	if solid_row_streak == 1:
+		bomb_count[BombType.NORMAL] += 1
+	elif solid_row_streak == 2:
+		bomb_count[BombType.SUPER] += 1
+	elif solid_row_streak == 3:
+		bomb_count[BombType.ULTRA] += 1
+	elif solid_row_streak == 4:
+		bomb_count[BombType.MASTER] += 1
+
+	decrement_turn_counter()
+	if turn_counter > 0 and mode == GameMode.TETRIS:
 		falling_block = block_spawner.spawn_random_block()
 		falling_block.block_placed.connect(on_block_placed)
-	else:
+	
+func decrement_turn_counter():
+	turn_counter -= 1
+	
+	if turn_counter == 0:
 		if mode == GameMode.TETRIS:
 			mode = GameMode.WORDSEARCH
 			turn_counter = MAX_WORDSEARCH_TURN_COUNT
 		else:
-			mode == GameMode.TETRIS
+			mode = GameMode.TETRIS
 			turn_counter = MAX_TETRIS_TURN_COUNT
+			falling_block = block_spawner.spawn_random_block()
+			falling_block.block_placed.connect(on_block_placed)
+			
+			selecting = false
+			selection_begin = Vector2.ZERO
+			selection_end = Vector2.ZERO
 		
 		mode_changed.emit(mode)
+
+func skip_word_search():
+	mode = GameMode.TETRIS
+	turn_counter = MAX_TETRIS_TURN_COUNT
+	falling_block = block_spawner.spawn_random_block()
+	falling_block.block_placed.connect(on_block_placed)
 	
+	mode_changed.emit(mode)
+
 func get_mode() -> GameMode:
 	return mode
+
+func is_word(word: String):
+	if word.length() < 3:
+		return false
+	return word.to_lower() in words
 
 func begin_selection(begin_pos: Vector2i):
 	selecting = true
@@ -128,9 +247,158 @@ func begin_selection(begin_pos: Vector2i):
 func is_selecting() -> bool:
 	return selecting
 	
+func set_selection_end(end_pos: Vector2i):
+	selection_end = end_pos
+	
+	var divisor: float = abs(selection_end.y - selection_begin.y)
+	var ratio: float = 0.0
+	if divisor != 0:
+		ratio = abs(selection_end.x - selection_begin.x) / divisor
+	#print(ratio)
+	if ratio > 0.5 and ratio < 2:
+		selection_direction = Direction.DIAGONAL
+	elif abs(selection_end.x - selection_begin.x) > abs(selection_end.y - selection_begin.y):
+		selection_direction = Direction.HORIZONTAL
+	else:
+		selection_direction = Direction.VERTICAL
+	
+func end_selection():
+	var selected_words = get_selected_words()
+	if is_word(selected_words[0]) or is_word(selected_words[1]):
+		destroy_selection()
+		camera.shake(0.5)
+		grid_changed.emit()
+		decrement_turn_counter()
+	
+	selecting = false
+	selection_begin = Vector2i.ZERO
+	selection_end = Vector2i.ZERO
+
+func destroy_selection():
+	if selection_direction == Direction.VERTICAL:
+		var x = selection_begin.x
+		var top = min(selection_begin.y, selection_end.y)
+		var bottom = max(selection_begin.y, selection_end.y)
+		for i in range(bottom - top + 1):
+			var pos = Vector2i(
+				x,
+				top + i
+			)
+			if grid[pos].letter != null:
+				grid[pos] = {
+					solid = false,
+					texture = null,
+					letter = null
+				}
+				grid_changed.emit(pos)
+	elif selection_direction == Direction.HORIZONTAL:
+		var y = selection_begin.y
+		var left = min(selection_begin.x, selection_end.x)
+		var right = max(selection_begin.x, selection_end.x)
+		for i in range(right - left + 1):
+			var pos = Vector2i(
+				left + i,
+				y
+			)
+			if grid[pos].letter != null:
+				grid[pos] = {
+					solid = false,
+					texture = null,
+					letter = null
+				}
+				grid_changed.emit(pos)
+	elif selection_direction == Direction.DIAGONAL:
+		var diff = selection_end - selection_begin
+		var length = min(abs(diff.x), abs(diff.y))
+		var direction = Vector2i(
+			1 if selection_end.x > selection_begin.x else -1,
+			1 if selection_end.y > selection_begin.y else -1
+		)
+		for i in range(length + 1):
+			var pos = selection_begin + direction * i
+			if grid[pos].letter != null:
+				grid[pos] = {
+					solid = false,
+					texture = null,
+					letter = null
+				}
+				grid_changed.emit(pos)
+
+func get_selected_words() -> Array[String]:
+	if selection_direction == Direction.VERTICAL:
+		var x = selection_begin.x
+		var top = min(selection_begin.y, selection_end.y)
+		var bottom = max(selection_begin.y, selection_end.y)
+		var word = ""
+		for i in range(bottom - top + 1):
+			var pos = Vector2i(
+				x,
+				top + i
+			)
+			if !grid[pos].solid or grid[pos].letter == null:
+				break
+			word += grid[pos].letter
+		return [word,word.reverse()]
+	elif selection_direction == Direction.HORIZONTAL:
+		var y = selection_begin.y
+		var left = min(selection_begin.x, selection_end.x)
+		var right = max(selection_begin.x, selection_end.x)
+		var word = ""
+		for i in range(right - left + 1):
+			var pos = Vector2i(
+				left + i,
+				y
+			)
+			if !grid[pos].solid or grid[pos].letter == null:
+				break
+			word += grid[pos].letter
+		return [word,word.reverse()]
+	elif selection_direction == Direction.DIAGONAL:
+		var diff = selection_end - selection_begin
+		var length = min(abs(diff.x), abs(diff.y))
+		var direction = Vector2i(
+			1 if selection_end.x > selection_begin.x else -1,
+			1 if selection_end.y > selection_begin.y else -1
+		)
+		var word = ""
+		for i in range(length + 1):
+			var pos = selection_begin + direction * i
+			if !grid[pos].solid or grid[pos].letter == null:
+				break
+			word += grid[pos].letter
+		return [word,word.reverse()]
+		
+	return ["",""]
+
 func is_tile_pos_in_selection(tile_pos: Vector2i) -> bool:
-	return tile_pos.x <= selection_end.x and tile_pos.x >= selection_begin.x and \
-		   tile_pos.y <= selection_end.y and tile_pos.y >= selection_begin.y
+	if selection_direction == Direction.VERTICAL:
+		var x = selection_begin.x
+		var top = min(selection_begin.y, selection_end.y)
+		var bottom = max(selection_begin.y, selection_end.y)
+		if tile_pos.x == x and tile_pos.y >= top and tile_pos.y <= bottom:
+			return true
+		return false
+	elif selection_direction == Direction.HORIZONTAL:
+		var y = selection_begin.y
+		var left = min(selection_begin.x, selection_end.x)
+		var right = max(selection_begin.x, selection_end.x)
+		if tile_pos.y == y and tile_pos.x >= left and tile_pos.x <= right:
+			return true
+		return false
+	elif selection_direction == Direction.DIAGONAL:
+		var diff = selection_end - selection_begin
+		var length = min(abs(diff.x) + 1, abs(diff.y) + 1)
+		var direction = Vector2i(
+			1 if selection_end.x > selection_begin.x else -1,
+			1 if selection_end.y > selection_begin.y else -1
+		)
+		for i in range(length):
+			if tile_pos == selection_begin + direction * i:
+				return true
+		
+		return false
+		
+	return false
 
 func on_tile_move_down_timer_timeout():
 	tile_move_down.emit()
@@ -179,3 +447,6 @@ func _physics_process(delta):
 	if last_down_press_time > 0.5 and Input.is_action_pressed("move_down"):
 		tile_move_down_timer.start()
 		on_tile_move_down_timer_timeout()
+	
+	if Input.is_action_just_released("selection"):
+		end_selection()

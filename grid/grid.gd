@@ -45,6 +45,7 @@ func _ready():
 				x - GameMaster.GRID_WIDTH / 2, 
 				y - GameMaster.GRID_HEIGHT / 2
 				) * grid_spacing
+			selection_area.tile_pos = Vector2i(x, y)
 			add_child(selection_area)
 			selection_areas[Vector2i(x, y)] = selection_area
 			
@@ -61,8 +62,14 @@ func _ready():
 func on_grid_changed(tile_pos: Vector2i):
 	if tile_pos in tiles.keys():
 		var tile_data = GameMaster.get_tile_at(tile_pos)
-		tiles[tile_pos].texture = tile_data.texture
-		letter_tiles[tile_pos].texture = GameMaster.get_letter_texture(tile_data.letter)
+		if !tile_data.solid or tile_data.texture == null:
+			tiles[tile_pos].texture = empty_grid_tile_tex
+		else:
+			tiles[tile_pos].texture = tile_data.texture
+		if tile_data.letter != null:
+			letter_tiles[tile_pos].texture = GameMaster.get_letter_texture(tile_data.letter)
+		else:
+			letter_tiles[tile_pos].texture = null
 
 func on_mode_changed(mode: GameMaster.GameMode):
 	if mode == GameMaster.GameMode.TETRIS:
@@ -73,7 +80,7 @@ func on_mode_changed(mode: GameMaster.GameMode):
 func enable_color():
 	for tile_pos in tiles.keys():
 		var tile_data = GameMaster.get_tile_at(tile_pos)
-		tiles[tile_pos].texture = tile_data.texture
+		tiles[tile_pos].texture = tile_data.texture if tile_data.texture != null else empty_grid_tile_tex
 
 func disable_color():
 	for tile_pos in tiles.keys():

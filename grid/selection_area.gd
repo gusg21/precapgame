@@ -16,7 +16,15 @@ func _on_area_2d_mouse_exited():
 		mouse_over = false
 
 func _process(delta):
-	if mouse_over and GameMaster.get_mode() == GameMaster.GameMode.WORDSEARCH and Input.is_action_just_pressed("selection") and !GameMaster.is_selecting():
-		GameMaster.begin_selection(tile_pos)
+	if mouse_over and GameMaster.get_mode() == GameMaster.GameMode.WORDSEARCH:
+		if GameMaster.is_bomb_placing():
+			if Input.is_action_just_pressed("selection"):
+				GameMaster.do_bomb_at(tile_pos)
+		else:
+			if Input.is_action_just_pressed("selection") and !GameMaster.is_selecting():
+				GameMaster.begin_selection(tile_pos)
+			elif Input.is_action_pressed("selection") and GameMaster.is_selecting():
+				GameMaster.set_selection_end(tile_pos)
 	
-	$Sprite2D.visible = mouse_over or (GameMaster.is_selecting() and GameMaster.is_tile_pos_in_selection(tile_pos))
+	$Sprite2D.visible = (mouse_over and !GameMaster.is_selecting()) or \
+						(GameMaster.is_selecting() and GameMaster.is_tile_pos_in_selection(tile_pos))
