@@ -8,11 +8,13 @@ class_name Grid
 
 var tiles: Dictionary = {}
 var letter_tiles: Dictionary = {}
+var selection_areas: Dictionary = {}
 
 
 func _enter_tree():
 	GameMaster.grid_object = self
 	GameMaster.grid_changed.connect(on_grid_changed)
+	GameMaster.mode_changed.connect(on_mode_changed)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -38,6 +40,14 @@ func _ready():
 			add_child(letter_tile)
 			letter_tiles[Vector2i(x, y)] = letter_tile
 			
+			var selection_area = preload("res://grid/selection_area.tscn").instantiate()
+			selection_area.position = Vector2i(
+				x - GameMaster.GRID_WIDTH / 2, 
+				y - GameMaster.GRID_HEIGHT / 2
+				) * grid_spacing
+			add_child(selection_area)
+			selection_areas[Vector2i(x, y)] = selection_area
+			
 	var bg = grid_bg_scene.instantiate()
 	bg = bg as NinePatchRect
 	bg.size = Vector2(
@@ -53,6 +63,23 @@ func on_grid_changed(tile_pos: Vector2i):
 		var tile_data = GameMaster.get_tile_at(tile_pos)
 		tiles[tile_pos].texture = tile_data.texture
 		letter_tiles[tile_pos].texture = GameMaster.get_letter_texture(tile_data.letter)
+
+func on_mode_changed(mode: GameMaster.GameMode):
+	if mode == GameMaster.GameMode.TETRIS:
+		enable_color()
+	else:
+		disable_color()
+
+func enable_color():
+	for tile_pos in tiles.keys():
+		var tile_data = GameMaster.get_tile_at(tile_pos)
+		tiles[tile_pos].texture = tile_data.texture
+
+func disable_color():
+	for tile_pos in tiles.keys():
+		var tile_data = GameMaster.get_tile_at(tile_pos)
+		if tile_data.solid:
+			tiles[tile_pos].texture = preload("res://grid/white_tile.png")
 
 func get_global_position_from_tile_pos(tile_pos: Vector2i) -> Vector2:
 	return Vector2(

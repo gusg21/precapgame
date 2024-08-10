@@ -1,8 +1,14 @@
 extends Node
 
+enum GameMode {
+	TETRIS, WORDSEARCH
+}
+
 const GRID_WIDTH = 10
 const GRID_HEIGHT = 20
 const TILE_MOVE_DOWN_SECS: float = 1
+const MAX_TETRIS_TURN_COUNT = 2
+const MAX_WORDSEARCH_TURN_COUNT = 5
 
 var LETTER_FREQUENCIES: Dictionary = {
 	"A" = 7.8,
@@ -40,9 +46,15 @@ var grid: Dictionary
 var tile_move_down_timer: Timer # block move down timer. bad name :(
 var falling_block: Block = null
 var last_down_press_time = 0
+var turn_counter = 0
+var mode: GameMode = GameMode.TETRIS
+var selecting: bool = false
+var selection_begin: Vector2i = Vector2i.ZERO
+var selection_end: Vector2i = Vector2i.ZERO
 
 signal tile_move_down
 signal grid_changed(tile_pos: Vector2i)
+signal mode_changed(mode: GameMode)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -69,6 +81,11 @@ func _ready():
 	
 	falling_block = block_spawner.spawn_random_block()
 	falling_block.block_placed.connect(on_block_placed)
+	
+	turn_counter = MAX_TETRIS_TURN_COUNT
+	
+func get_turn_counter() -> int:
+	return turn_counter
 
 func get_random_weighted_letter() -> String:
 	var weight_sum = 0 
@@ -83,11 +100,37 @@ func get_random_weighted_letter() -> String:
 	return "E"
 
 func on_block_placed():
+	turn_counter -= 1
 	falling_block.block_placed.disconnect(on_block_placed)
-	falling_block = block_spawner.spawn_random_block()
-	falling_block.block_placed.connect(on_block_placed)
-	
 	last_down_press_time = 0 # "hack" to make sure next block doesn't come careening down
+	
+	if turn_counter > 0:
+		falling_block = block_spawner.spawn_random_block()
+		falling_block.block_placed.connect(on_block_placed)
+	else:
+		if mode == GameMode.TETRIS:
+			mode = GameMode.WORDSEARCH
+			turn_counter = MAX_WORDSEARCH_TURN_COUNT
+		else:
+			mode == GameMode.TETRIS
+			turn_counter = MAX_TETRIS_TURN_COUNT
+		
+		mode_changed.emit(mode)
+	
+func get_mode() -> GameMode:
+	return mode
+
+func begin_selection(begin_pos: Vector2i):
+	selecting = true
+	selection_begin = begin_pos
+	selection_end = begin_pos
+
+func is_selecting() -> bool:
+	return selecting
+	
+func is_tile_pos_in_selection(tile_pos: Vector2i) -> bool:
+	return tile_pos.x <= selection_end.x and tile_pos.x >= selection_begin.x and \
+		   tile_pos.y <= selection_end.y and tile_pos.y >= selection_begin.y
 
 func on_tile_move_down_timer_timeout():
 	tile_move_down.emit()

@@ -1,15 +1,19 @@
-[gd_scene load_steps=18 format=3 uid="uid://i1yrygt6eicc"]
+[gd_scene load_steps=22 format=3 uid="uid://i1yrygt6eicc"]
 
 [ext_resource type="PackedScene" uid="uid://djqq4ipexojpl" path="res://block/block.tscn" id="1_ar0ab"]
 [ext_resource type="Texture2D" uid="uid://bps3qkbq2wpw0" path="res://bg/tetris_bg.png" id="2_aomdg"]
 [ext_resource type="Script" path="res://utils/scroller.gd" id="3_cdk7q"]
+[ext_resource type="Script" path="res://bg/bg_changer.gd" id="3_se670"]
 [ext_resource type="Script" path="res://grid/grid.gd" id="4_sxwvi"]
 [ext_resource type="Texture2D" uid="uid://cd71717iixwi8" path="res://grid/empty_grid_tile.png" id="5_ffhhw"]
 [ext_resource type="PackedScene" uid="uid://dmci70rf5h6p" path="res://grid/grid_bg.tscn" id="6_8xisf"]
 [ext_resource type="Texture2D" uid="uid://emok5lfp0ka1" path="res://grid/tetris_text.png" id="6_iu31q"]
 [ext_resource type="Texture2D" uid="uid://bqkgbxlg8n45s" path="res://grid/wordsearch_text.png" id="7_6wuwf"]
+[ext_resource type="Script" path="res://grid/grid_text.gd" id="7_df5je"]
 [ext_resource type="Script" path="res://blockspawner/block_spawner.gd" id="7_qjl1v"]
 [ext_resource type="Texture2D" uid="uid://ddto2bhydudnw" path="res://block/tiles.png" id="8_xqimb"]
+[ext_resource type="Script" path="res://turntimer/turn_timer.gd" id="11_lnhbx"]
+[ext_resource type="Texture2D" uid="uid://bm1epgampw52d" path="res://turntimer/turn_timer_pip.png" id="12_eerp2"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_q1spn"]
 atlas = ExtResource("8_xqimb")
@@ -44,7 +48,6 @@ region = Rect2(48, 0, 8, 8)
 [node name="BGLayer" type="CanvasLayer" parent="."]
 layer = 0
 follow_viewport_enabled = true
-follow_viewport_scale = 0.5
 
 [node name="BG" type="Sprite2D" parent="BGLayer"]
 texture = ExtResource("2_aomdg")
@@ -52,6 +55,10 @@ region_enabled = true
 region_rect = Rect2(0, 0, 2000, 2000)
 script = ExtResource("3_cdk7q")
 speed = 4.0
+
+[node name="BGChanger" type="Node2D" parent="BGLayer"]
+script = ExtResource("3_se670")
+bg_node_path = NodePath("../BG")
 
 [node name="GameplayLayer" type="CanvasLayer" parent="."]
 follow_viewport_enabled = true
@@ -65,16 +72,61 @@ empty_grid_tile_tex = ExtResource("5_ffhhw")
 grid_bg_scene = ExtResource("6_8xisf")
 
 [node name="TetrisText" type="Sprite2D" parent="GameplayLayer"]
-position = Vector2(3, 126)
+position = Vector2(3, 116)
 texture = ExtResource("6_iu31q")
+script = ExtResource("7_df5je")
 
 [node name="WordsearchText" type="Sprite2D" parent="GameplayLayer"]
-visible = false
-position = Vector2(2, -120)
+position = Vector2(2, -113)
 texture = ExtResource("7_6wuwf")
+script = ExtResource("7_df5je")
+enabled_mode = 1
 
 [node name="BlockSpawner" type="Node2D" parent="GameplayLayer"]
 script = ExtResource("7_qjl1v")
 block_scene = ExtResource("1_ar0ab")
 block_strings = Array[String](["10@@@,_@", "00@@,@@", "10@@@@", "10@@,_@@", "10__@,@@@", "10@@@,@", "10_@@,@@"])
 block_textures = Array[Texture2D]([SubResource("AtlasTexture_q1spn"), SubResource("AtlasTexture_xpo72"), SubResource("AtlasTexture_26low"), SubResource("AtlasTexture_6tq7y"), SubResource("AtlasTexture_8bbg4"), SubResource("AtlasTexture_pjv2e"), SubResource("AtlasTexture_fm6i0")])
+
+[node name="TurnTimer" type="Node2D" parent="GameplayLayer"]
+script = ExtResource("11_lnhbx")
+
+[node name="TurnTimerPip" type="Sprite2D" parent="GameplayLayer/TurnTimer"]
+position = Vector2(69, -51)
+texture = ExtResource("12_eerp2")
+
+[node name="TurnTimerPip2" type="Sprite2D" parent="GameplayLayer/TurnTimer"]
+position = Vector2(69, -40)
+texture = ExtResource("12_eerp2")
+
+[node name="TurnTimerPip3" type="Sprite2D" parent="GameplayLayer/TurnTimer"]
+position = Vector2(69, -29)
+texture = ExtResource("12_eerp2")
+
+[node name="TurnTimerPip4" type="Sprite2D" parent="GameplayLayer/TurnTimer"]
+position = Vector2(69, -18)
+texture = ExtResource("12_eerp2")
+
+[node name="TurnTimerPip5" type="Sprite2D" parent="GameplayLayer/TurnTimer"]
+position = Vector2(69, -7)
+texture = ExtResource("12_eerp2")
+
+[node name="TurnTimerPip6" type="Sprite2D" parent="GameplayLayer/TurnTimer"]
+position = Vector2(69, 4)
+texture = ExtResource("12_eerp2")
+
+[node name="TurnTimerPip7" type="Sprite2D" parent="GameplayLayer/TurnTimer"]
+position = Vector2(69, 15)
+texture = ExtResource("12_eerp2")
+
+[node name="TurnTimerPip8" type="Sprite2D" parent="GameplayLayer/TurnTimer"]
+position = Vector2(69, 26)
+texture = ExtResource("12_eerp2")
+
+[node name="TurnTimerPip10" type="Sprite2D" parent="GameplayLayer/TurnTimer"]
+position = Vector2(69, 37)
+texture = ExtResource("12_eerp2")
+
+[node name="TurnTimerPip9" type="Sprite2D" parent="GameplayLayer/TurnTimer"]
+position = Vector2(69, 48)
+texture = ExtResource("12_eerp2")
