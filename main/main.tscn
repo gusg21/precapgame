@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://i1yrygt6eicc"]
+[gd_scene load_steps=34 format=3 uid="uid://i1yrygt6eicc"]
 
 [ext_resource type="PackedScene" uid="uid://djqq4ipexojpl" path="res://block/block.tscn" id="1_ar0ab"]
 [ext_resource type="Texture2D" uid="uid://bps3qkbq2wpw0" path="res://bg/tetris_bg.png" id="2_aomdg"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://camera/camera.gd" id="4_pej62"]
 [ext_resource type="Script" path="res://grid/grid.gd" id="4_sxwvi"]
 [ext_resource type="Texture2D" uid="uid://cd71717iixwi8" path="res://grid/empty_grid_tile.png" id="5_ffhhw"]
+[ext_resource type="Texture2D" uid="uid://c1sftvosnx2m3" path="res://grid/grid_mask.png" id="5_h67gd"]
 [ext_resource type="PackedScene" uid="uid://dmci70rf5h6p" path="res://grid/grid_bg.tscn" id="6_8xisf"]
 [ext_resource type="Texture2D" uid="uid://emok5lfp0ka1" path="res://grid/tetris_text.png" id="6_iu31q"]
 [ext_resource type="Texture2D" uid="uid://bqkgbxlg8n45s" path="res://grid/wordsearch_text.png" id="7_6wuwf"]
@@ -77,8 +78,10 @@ follow_viewport_enabled = true
 [node name="Camera2D" type="Camera2D" parent="GameplayLayer"]
 script = ExtResource("4_pej62")
 
-[node name="Grid" type="Node2D" parent="GameplayLayer"]
+[node name="Grid" type="Sprite2D" parent="GameplayLayer"]
+clip_children = 1
 z_index = -1
+texture = ExtResource("5_h67gd")
 script = ExtResource("4_sxwvi")
 empty_grid_tile_tex = ExtResource("5_ffhhw")
 grid_bg_scene = ExtResource("6_8xisf")
@@ -196,3 +199,7 @@ theme_override_fonts/font = ExtResource("15_2a34e")
 theme_override_font_sizes/font_size = 7
 text = "CANCEL BOMB"
 script = ExtResource("25_pklp7")
+
+[node name="GridMask" type="Sprite2D" parent="."]
+position = Vector2(27, -27)
+texture = ExtResource("5_h67gd")

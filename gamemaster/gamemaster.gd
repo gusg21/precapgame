@@ -63,10 +63,10 @@ var selection_end: Vector2i = Vector2i.ZERO
 var selection_direction: Direction = Direction.VERTICAL
 var words: Array = []
 var bomb_count: Dictionary = {
-	BombType.NORMAL: 0,
-	BombType.SUPER: 0,
-	BombType.ULTRA: 0,
-	BombType.MASTER: 0
+	BombType.NORMAL: 3,
+	BombType.SUPER: 3,
+	BombType.ULTRA: 3,
+	BombType.MASTER: 3
 }
 var bomb_placing: bool = false
 var bomb_placing_type: BombType = BombType.NORMAL
@@ -131,7 +131,7 @@ func is_bomb_placing() -> bool:
 func cancel_bomb():
 	bomb_placing = false
 
-func do_bomb_at(tile_pos: Vector2):
+func get_bomb_size():
 	var size = 3
 	if bomb_placing_type == BombType.NORMAL:
 		size = 3
@@ -141,6 +141,10 @@ func do_bomb_at(tile_pos: Vector2):
 		size = 7
 	elif bomb_placing_type == BombType.MASTER:
 		size = 9
+	return size
+
+func do_bomb_at(tile_pos: Vector2):
+	var size = get_bomb_size()
 	
 	for x in range(size):
 		for y in range(size):
