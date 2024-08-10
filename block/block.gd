@@ -9,13 +9,17 @@ const BLOCK_SIZE = 8
 
 var block_tile_offsets: Array
 var tile_pos: Vector2i
+var graphics: Array[Node]
+var letter_offsets: Dictionary
 
 signal block_placed
 
 func _ready():
 	block_tile_offsets = parse_block_tile_offsets_from_block_string(block_string)
 	
-	generate_graphics(block_tile_offsets)
+	for offset in block_tile_offsets:
+		letter_offsets[offset] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[randi_range(0, 25)]
+	generate_graphics(block_tile_offsets, letter_offsets)
 	
 	GameMaster.tile_move_down.connect(on_tile_move_down)
 	
@@ -34,6 +38,14 @@ func _process(delta):
 		if !check_direction_solid(Vector2.RIGHT):
 			tile_pos.x += 1
 			update_global_position()
+			
+	if Input.is_action_just_pressed("move_up"):
+		var right_rotated_offsets = rotate_right(block_tile_offsets)
+		if !check_offsets_solid(right_rotated_offsets):
+			block_tile_offsets = right_rotated_offsets
+			letter_offsets = rotate_letters_right(letter_offsets)
+			clear_graphics()
+			generate_graphics(block_tile_offsets, letter_offsets)
 
 func check_direction_solid(direction: Vector2i) -> bool:
 	for offset in block_tile_offsets:
@@ -47,8 +59,41 @@ func check_direction_solid(direction: Vector2i) -> bool:
 			
 	return false
 
+func check_offsets_solid(offsets: Array) -> bool:
+	for offset in offsets:
+		var off_tile_pos = tile_pos + offset
+		#if tile_pos.y == GameMaster.GRID_HEIGHT - 1:
+			## hit the bottom
+			#place_self()
+			
+		if GameMaster.is_tile_solid(off_tile_pos):
+			return true
+			
+	return false
+
+func rotate_left(offsets):
+	var rotated = []
+	for offset in offsets:
+		rotated.append(Vector2i(offset.y, -offset.x))
+	return rotated
+
+func rotate_right(offsets): # hi gus, make the letters apply to the grid visuals :)
+	var rotated = []
+	for offset in offsets:
+		rotated.append(Vector2i(-offset.y, offset.x))
+	return rotated
+
+func rotate_letters_right(letters):
+	var rotated = {}
+	for offset in letters.keys():
+		rotated[Vector2i(-offset.y, offset.x)] = letters[offset]
+	return rotated
+
 func set_block_string(string):
 	block_string = string
+	
+func set_block_texture(texture):
+	block_texture = texture
 
 func update_global_position():
 	global_position = GameMaster.get_global_position_from_tile_pos(tile_pos)
@@ -56,13 +101,30 @@ func update_global_position():
 func on_tile_move_down():
 	try_move_down()
 	
-func generate_graphics(block_tile_offsets):
+func generate_graphics(block_tile_offsets, letter_offsets):
 	for offset in block_tile_offsets:
 		var sprite = Sprite2D.new()
 		sprite.texture = block_texture
 		sprite.centered = false
 		sprite.position = offset * BLOCK_SIZE
 		add_child(sprite)
+		graphics.append(sprite)
+		
+	for letter_offset in letter_offsets.keys():
+		var letter_sprite = Sprite2D.new()
+		letter_sprite.texture = AtlasTexture.new()
+		letter_sprite.texture.atlas = preload("res://block/letters.png")
+		var letter_index = letter_offsets[letter_offset].to_upper().to_ascii_buffer()[0] - "A".to_ascii_buffer()[0]
+		letter_sprite.texture.region = Rect2((letter_index % 8) * 8, (letter_index / 8) * 8, 8, 8)
+		letter_sprite.centered = false
+		letter_sprite.position = letter_offset * BLOCK_SIZE
+		add_child(letter_sprite)
+		graphics.append(letter_sprite)
+		
+func clear_graphics():
+	for sprite in graphics:
+		sprite.queue_free()
+	graphics.clear()
 
 func parse_block_tile_offsets_from_block_string(string: String):
 	var top_left_offset = Vector2i(

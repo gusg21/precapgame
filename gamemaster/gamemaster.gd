@@ -1,7 +1,7 @@
 extends Node
 
-const GRID_WIDTH = 12
-const GRID_HEIGHT = 24
+const GRID_WIDTH = 10
+const GRID_HEIGHT = 20
 const TILE_MOVE_DOWN_SECS: float = 1
 
 var grid_object: Grid
@@ -17,6 +17,8 @@ signal grid_changed(tile_pos: Vector2i)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	randomize()
+	
 	for x in range(GRID_WIDTH):
 		for y in range(GRID_HEIGHT):
 			grid[Vector2i(x, y)] = {
@@ -41,7 +43,7 @@ func on_block_placed():
 	falling_block = block_spawner.spawn_random_block()
 	falling_block.block_placed.connect(on_block_placed)
 	
-	last_down_press_time = 0 # hack to make sure next block doesn't come careening down
+	last_down_press_time = 0 # "hack" to make sure next block doesn't come careening down
 
 func on_tile_move_down_timer_timeout():
 	tile_move_down.emit()

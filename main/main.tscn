@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://i1yrygt6eicc"]
+[gd_scene load_steps=18 format=3 uid="uid://i1yrygt6eicc"]
 
 [ext_resource type="PackedScene" uid="uid://djqq4ipexojpl" path="res://block/block.tscn" id="1_ar0ab"]
 [ext_resource type="Texture2D" uid="uid://bps3qkbq2wpw0" path="res://bg/tetris_bg.png" id="2_aomdg"]
@@ -6,7 +6,38 @@
 [ext_resource type="Script" path="res://grid/grid.gd" id="4_sxwvi"]
 [ext_resource type="Texture2D" uid="uid://cd71717iixwi8" path="res://grid/empty_grid_tile.png" id="5_ffhhw"]
 [ext_resource type="PackedScene" uid="uid://dmci70rf5h6p" path="res://grid/grid_bg.tscn" id="6_8xisf"]
+[ext_resource type="Texture2D" uid="uid://emok5lfp0ka1" path="res://grid/tetris_text.png" id="6_iu31q"]
+[ext_resource type="Texture2D" uid="uid://bqkgbxlg8n45s" path="res://grid/wordsearch_text.png" id="7_6wuwf"]
 [ext_resource type="Script" path="res://blockspawner/block_spawner.gd" id="7_qjl1v"]
+[ext_resource type="Texture2D" uid="uid://ddto2bhydudnw" path="res://block/tiles.png" id="8_xqimb"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_q1spn"]
+atlas = ExtResource("8_xqimb")
+region = Rect2(0, 0, 8, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xpo72"]
+atlas = ExtResource("8_xqimb")
+region = Rect2(8, 0, 8, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_26low"]
+atlas = ExtResource("8_xqimb")
+region = Rect2(16, 0, 8, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6tq7y"]
+atlas = ExtResource("8_xqimb")
+region = Rect2(24, 0, 8, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8bbg4"]
+atlas = ExtResource("8_xqimb")
+region = Rect2(32, 0, 8, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pjv2e"]
+atlas = ExtResource("8_xqimb")
+region = Rect2(40, 0, 8, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fm6i0"]
+atlas = ExtResource("8_xqimb")
+region = Rect2(48, 0, 8, 8)
 
 [node name="Main" type="Node2D"]
 
@@ -33,7 +64,17 @@ script = ExtResource("4_sxwvi")
 empty_grid_tile_tex = ExtResource("5_ffhhw")
 grid_bg_scene = ExtResource("6_8xisf")
 
+[node name="TetrisText" type="Sprite2D" parent="GameplayLayer"]
+position = Vector2(3, 126)
+texture = ExtResource("6_iu31q")
+
+[node name="WordsearchText" type="Sprite2D" parent="GameplayLayer"]
+visible = false
+position = Vector2(2, -120)
+texture = ExtResource("7_6wuwf")
+
 [node name="BlockSpawner" type="Node2D" parent="GameplayLayer"]
 script = ExtResource("7_qjl1v")
 block_scene = ExtResource("1_ar0ab")
-block_strings = Array[String](["10@@@,_@"])
+block_strings = Array[String](["10@@@,_@", "00@@,@@", "10@@@@", "10@@,_@@", "10__@,@@@", "10@@@,@", "10_@@,@@"])
+block_textures = Array[Texture2D]([SubResource("AtlasTexture_q1spn"), SubResource("AtlasTexture_xpo72"), SubResource("AtlasTexture_26low"), SubResource("AtlasTexture_6tq7y"), SubResource("AtlasTexture_8bbg4"), SubResource("AtlasTexture_pjv2e"), SubResource("AtlasTexture_fm6i0")])
