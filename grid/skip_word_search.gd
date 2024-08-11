@@ -1,6 +1,7 @@
 extends Button
 
 func _pressed():
+	AudioMan.play(preload("res://utils/button_pressed.mp3"))
 	GameMaster.skip_word_search()
 	
 func _process(delta):

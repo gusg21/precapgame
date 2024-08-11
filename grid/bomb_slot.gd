@@ -34,6 +34,7 @@ func _process(delta):
 	$BombLabel.text = GameMaster.BombType.keys()[bomb_type]
 	
 	if Input.is_action_just_pressed("selection") and mouse_over and enabled:
+		AudioMan.play(preload("res://utils/button_pressed.mp3"))
 		GameMaster.begin_bomb_placing(bomb_type)
 
 func on_bomb_count_update(type: GameMaster.BombType, count: int):

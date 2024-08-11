@@ -1,0 +1,24 @@
+[gd_resource type="AudioBusLayout" load_steps=3 format=3 uid="uid://c7wpijmf7ubpk"]
+
+[sub_resource type="AudioEffectLowPassFilter" id="AudioEffectLowPassFilter_knnhg"]
+resource_name = "LowPassFilter"
+cutoff_hz = 1000.0
+resonance = 0.34
+db = 1
+
+[sub_resource type="AudioEffectReverb" id="AudioEffectReverb_cynda"]
+resource_name = "Reverb"
+room_size = 0.44
+wet = 0.27
+
+[resource]
+bus/1/name = &"Music"
+bus/1/solo = false
+bus/1/mute = false
+bus/1/bypass_fx = false
+bus/1/volume_db = -0.328256
+bus/1/send = &"Master"
+bus/1/effect/0/effect = SubResource("AudioEffectLowPassFilter_knnhg")
+bus/1/effect/0/enabled = true
+bus/1/effect/1/effect = SubResource("AudioEffectReverb_cynda")
+bus/1/effect/1/enabled = true

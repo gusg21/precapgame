@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dn3j5bgkh0qm4"
+path="res://.godot/imported/Philly hit sound effect.mp3-81de42c13105917a2e8f547f9a355f8f.mp3str"
+
+[deps]
+
+source_file="res://grid/Philly hit sound effect.mp3"
+dest_files=["res://.godot/imported/Philly hit sound effect.mp3-81de42c13105917a2e8f547f9a355f8f.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

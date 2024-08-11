@@ -34,19 +34,28 @@ func _process(delta):
 	if Input.is_action_just_pressed("move_left"):
 		if !check_direction_solid(Vector2.LEFT):
 			tile_pos.x -= 1
+			AudioMan.play_random_pitched(preload("res://grid/rachet.mp3"))
 			update_global_position()
+		else:
+			AudioMan.play_quieter(preload("res://grid/WROG.mp3"))
 	if Input.is_action_just_pressed("move_right"):
 		if !check_direction_solid(Vector2.RIGHT):
 			tile_pos.x += 1
+			AudioMan.play_random_pitched(preload("res://grid/rachet.mp3"))
 			update_global_position()
+		else:
+			AudioMan.play_quieter(preload("res://grid/WROG.mp3"))
 			
 	if Input.is_action_just_pressed("move_up"):
 		var right_rotated_offsets = rotate_right(block_tile_offsets)
 		if !check_offsets_solid(right_rotated_offsets):
+			AudioMan.play_random_pitched(preload("res://grid/rachet.mp3"))
 			block_tile_offsets = right_rotated_offsets
 			letter_offsets = rotate_letters_right(letter_offsets)
 			clear_graphics()
 			generate_graphics(block_tile_offsets, letter_offsets)
+		else:
+			AudioMan.play_quieter(preload("res://grid/WROG.mp3"))
 
 func check_direction_solid(direction: Vector2i) -> bool:
 	for offset in block_tile_offsets:

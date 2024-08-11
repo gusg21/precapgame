@@ -71,7 +71,7 @@ var _bomb_count: Dictionary = {
 }
 var bomb_placing: bool = false
 var bomb_placing_type: BombType = BombType.NORMAL
-var score: int = 0
+var score: int = 190000
 var game_over = false
 var high_scores = []
 var rounds = 0
@@ -293,6 +293,16 @@ func do_bomb_at(tile_pos: Vector2):
 	
 	camera.shake(0.1 * size)
 	
+	if bomb_placing_type == BombType.NORMAL:
+		AudioMan.play(preload("res://grid/bombExplode0.mp3"))		
+	elif bomb_placing_type == BombType.SUPER:
+		AudioMan.play(preload("res://grid/bombExplode1.mp3"))
+	elif bomb_placing_type == BombType.ULTRA:
+		AudioMan.play(preload("res://grid/bombExplode2.mp3"))
+	else:
+		AudioMan.play(preload("res://grid/bombExplode3.mp3"))
+		
+	
 	take_bomb(bomb_placing_type)
 	bomb_placing = false
 	
@@ -346,6 +356,16 @@ func on_block_placed():
 			for completed_row in completed_rows:
 				explode_at(get_global_position_from_tile_pos(Vector2i(0, completed_row)))
 				explode_at(get_global_position_from_tile_pos(Vector2i(GRID_WIDTH - 1, completed_row)))
+				
+			if completed_rows.size() == 1:
+				AudioMan.play(preload("res://grid/lineClear0.mp3"))
+			elif completed_rows.size() == 2:
+				AudioMan.play(preload("res://grid/lineClear1.mp3"))
+			elif completed_rows.size() == 3:
+				AudioMan.play(preload("res://grid/lineClear2.mp3"))
+			elif completed_rows.size() >= 4:
+				AudioMan.play(preload("res://grid/lineClear3.mp3"))
+		
 			completed_rows.clear()			
 			
 	if solid_row_streak == 1:
@@ -356,6 +376,20 @@ func on_block_placed():
 		add_bomb(BombType.ULTRA)
 	elif solid_row_streak == 4:
 		add_bomb(BombType.MASTER)
+		
+	for completed_row in completed_rows:
+		explode_at(get_global_position_from_tile_pos(Vector2i(0, completed_row)))
+		explode_at(get_global_position_from_tile_pos(Vector2i(GRID_WIDTH - 1, completed_row)))
+		
+	if completed_rows.size() == 1:
+		AudioMan.play(preload("res://grid/lineClear0.mp3"))
+	elif completed_rows.size() == 2:
+		AudioMan.play(preload("res://grid/lineClear1.mp3"))
+	elif completed_rows.size() == 3:
+		AudioMan.play(preload("res://grid/lineClear2.mp3"))
+	elif completed_rows.size() >= 4:
+		AudioMan.play(preload("res://grid/lineClear3.mp3"))
+		
 
 	decrement_turn_counter()
 	if turn_counter > 0 and mode == GameMode.TETRIS and not game_over:
@@ -386,6 +420,7 @@ func decrement_turn_counter():
 			selection_end = Vector2.ZERO
 			rounds += 1
 		
+		AudioMan.play(preload("res://grid/modeSwitch.mp3"))
 		mode_changed.emit(mode)
 
 func skip_word_search():
@@ -413,6 +448,15 @@ func is_selecting() -> bool:
 	return selecting
 	
 func set_selection_end(end_pos: Vector2i):
+	if selection_end != end_pos:
+		var sound = [
+			preload("res://grid/wordSelect0.mp3"),
+			preload("res://grid/wordSelect1.mp3"),
+			preload("res://grid/wordSelect2.mp3"),
+			preload("res://grid/wordSelect3.mp3"),
+		].pick_random()
+		AudioMan.play(sound)
+	
 	selection_end = end_pos
 	
 	var divisor: float = abs(selection_end.y - selection_begin.y)
@@ -450,6 +494,7 @@ func end_selection():
 		if word_length >= 9:
 			score = pow(20000, word_length - 8)
 		add_score(score, get_global_position_from_tile_pos(selection_begin))
+		AudioMan.play(preload("res://grid/wordExplode.mp3"))
 	
 	selecting = false
 	selection_begin = Vector2i.ZERO
@@ -626,13 +671,15 @@ func get_letter_texture(letter: String) -> Texture2D:
 func _physics_process(delta):
 	last_down_press_time += delta
 	
-	if Input.is_action_just_pressed("move_down"):
+	if Input.is_action_just_pressed("move_down") and mode == GameMode.TETRIS:
 		last_down_press_time = 0
+		AudioMan.play_random_pitched(preload("res://grid/rachet.mp3"))
 		tile_move_down_timer.start()
 		on_tile_move_down_timer_timeout()
 	
-	if last_down_press_time > 0.5 and Input.is_action_pressed("move_down"):
+	if last_down_press_time > 0.5 and Input.is_action_pressed("move_down") and mode == GameMode.TETRIS:
 		tile_move_down_timer.start()
+		AudioMan.play_random_pitched(preload("res://grid/rachet.mp3"))
 		on_tile_move_down_timer_timeout()
 	
 	if Input.is_action_just_released("selection"):

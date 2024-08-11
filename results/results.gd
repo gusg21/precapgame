@@ -5,6 +5,7 @@ class_name Results
 func _enter_tree():
 	GameMaster.stop_game()
 	$AnimationPlayer.play("reveal")
+	AudioMan.close_filter()
 
 func unreveal():
 	$AnimationPlayer.play_backwards("reveal")

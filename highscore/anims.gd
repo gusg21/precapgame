@@ -5,6 +5,8 @@ func _enter_tree():
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	AudioMan.close_filter()
+	AudioMan.play(preload("res://grid/fanfare.mp3"))
 	$AnimationPlayer.play("reveal")
 
 func unreveal():

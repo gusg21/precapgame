@@ -10,5 +10,6 @@ func _process(delta):
 	disabled = results.get_new_name() == ""
 
 func _pressed():
+	AudioMan.play(preload("res://utils/button_pressed.mp3"))
 	GameMaster.add_high_score(results.get_new_name(), GameMaster.get_score())
 	$"../..".unreveal()

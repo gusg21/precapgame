@@ -9,6 +9,7 @@ class_name ShuffleButton
 var new_name: String
 
 func _pressed():
+	AudioMan.play(preload("res://utils/button_pressed.mp3"))
 	new_name = GameMaster.get_random_weighted_letter() + GameMaster.get_random_weighted_letter() + GameMaster.get_random_weighted_letter()
 	name_label.text = new_name[0] + " " + \
 					  new_name[1] + " " + \

@@ -1,6 +1,8 @@
 extends Node2D
 
 func _ready():
+	AudioMan.open_filter()
+	
 	GameMaster.start_game.call_deferred()
 	$AnimationPlayer.play("reveal")
 	
