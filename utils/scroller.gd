@@ -5,6 +5,9 @@ extends Sprite2D
 
 static var intended_pos: Vector2
 
+func _enter_tree():
+	region_rect.position = intended_pos.snapped(Vector2.ONE)
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	intended_pos += direction * speed * delta

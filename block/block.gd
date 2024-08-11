@@ -97,7 +97,7 @@ func set_block_texture(texture):
 	block_texture = texture
 
 func update_global_position():
-	global_position = GameMaster.get_global_position_from_tile_pos(tile_pos)
+	position = GameMaster.get_global_position_from_tile_pos(tile_pos)
 	
 func on_tile_move_down():
 	try_move_down()
@@ -151,7 +151,7 @@ func try_move_down():
 	if check_direction_solid(Vector2i.DOWN):
 		place_self()
 		if !moved:
-			GameMaster.end_game()
+			GameMaster.stop_game()
 		return
 	
 	tile_pos.y += 1
@@ -168,5 +168,6 @@ func place_self():
 		})
 		
 	block_placed.emit()
+	AudioMan.play_random_pitched(preload("res://block/block_click.mp3"))
 	
 	queue_free()

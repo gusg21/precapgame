@@ -1,5 +1,4 @@
 extends Button
 
 func _pressed():
-	$"../../..".unreveal()
-	
+	get_tree().quit()

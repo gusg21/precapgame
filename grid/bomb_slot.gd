@@ -42,6 +42,7 @@ func on_bomb_count_update(type: GameMaster.BombType, count: int):
 			var diff = count - old_count
 			if diff > 0:
 				GameMaster.pop_at(str(diff), global_position)
+				GameMaster.explode_at(global_position)
 		
 		$Count.text = str(count)
 		old_count = count

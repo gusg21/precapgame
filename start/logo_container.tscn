@@ -1,0 +1,44 @@
+[gd_scene load_steps=9 format=3 uid="uid://byfw3mafck1b4"]
+
+[ext_resource type="PackedScene" uid="uid://e61riyyrcblk" path="res://start/letter_boom_logo.fbx" id="1_o54gp"]
+[ext_resource type="Shader" path="res://utils/palette.gdshader" id="1_u7ynp"]
+[ext_resource type="Texture2D" uid="uid://2313nqq5r2n0" path="res://utils/dawnbringer-32-1x.png" id="2_c62ge"]
+[ext_resource type="Script" path="res://start/logo_rotater.gd" id="4_p331h"]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_uqm64"]
+viewport_path = NodePath("SubViewport")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_o4k7r"]
+resource_local_to_scene = true
+shader = ExtResource("1_u7ynp")
+shader_parameter/palette = ExtResource("2_c62ge")
+shader_parameter/tex = SubResource("ViewportTexture_uqm64")
+
+[sub_resource type="Environment" id="Environment_0ldvp"]
+ambient_light_source = 2
+ambient_light_color = Color(1, 1, 1, 1)
+ambient_light_energy = 0.4
+
+[sub_resource type="World3D" id="World3D_jv6ck"]
+environment = SubResource("Environment_0ldvp")
+
+[node name="LogoContainer" type="Sprite2D"]
+material = SubResource("ShaderMaterial_o4k7r")
+texture = SubResource("ViewportTexture_uqm64")
+
+[node name="SubViewport" type="SubViewport" parent="."]
+own_world_3d = true
+world_3d = SubResource("World3D_jv6ck")
+transparent_bg = true
+size = Vector2i(1024, 1024)
+
+[node name="Root Scene" parent="SubViewport" instance=ExtResource("1_o54gp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.513622)
+script = ExtResource("4_p331h")
+
+[node name="Camera3D" type="Camera3D" parent="SubViewport"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0510589, 0.223494, 2.41443)
+fov = 79.2704
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="SubViewport"]
+transform = Transform3D(1, 0, 0, 0, 0.378196, -0.925725, 0, 0.925725, 0.378196, 0, 5.88842, 1.33214)

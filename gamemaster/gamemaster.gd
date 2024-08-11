@@ -74,6 +74,7 @@ var bomb_placing_type: BombType = BombType.NORMAL
 var score: int = 0
 var game_over = false
 var high_scores = []
+var rounds = 0
 
 
 signal tile_move_down
@@ -81,6 +82,7 @@ signal grid_changed(tile_pos: Vector2i)
 signal mode_changed(mode: GameMode)
 signal score_changed(score: int)
 signal bomb_count_update(bomb_type: BombType, count: int)
+signal game_stopped
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -98,6 +100,7 @@ func _ready():
 			load_default_scores = true
 		else:
 			if high_scores_from_file is Array:
+				high_scores_from_file.sort_custom(high_score_sort)
 				high_scores = high_scores_from_file
 			else:
 				load_default_scores = true
@@ -122,7 +125,7 @@ func _ready():
 			},
 			{
 				name = "DAV",
-				points = 0
+				points = 1000
 			},
 		]
 		save_high_scores()
@@ -138,6 +141,9 @@ func _ready():
 	tile_move_down_timer.one_shot = false
 	tile_move_down_timer.timeout.connect(on_tile_move_down_timer_timeout)
 	add_child(tile_move_down_timer)
+
+func high_score_sort(a, b):
+	return a.points > b.points
 
 func add_high_score(name: String, points: int):
 	var best_high_score_beaten = null
@@ -157,6 +163,7 @@ func add_high_score(name: String, points: int):
 		})
 	
 	save_high_scores()
+	high_scores.sort_custom(high_score_sort)
 
 func save_high_scores():
 	var high_score_file = FileAccess.open("user://data.boom", FileAccess.WRITE)
@@ -171,6 +178,7 @@ func is_high_score(score: int):
 
 func stop_game():
 	game_over = true
+	game_stopped.emit()
 
 func start_game():
 	game_over = false
@@ -190,6 +198,7 @@ func start_game():
 	falling_block = block_spawner.spawn_random_block()
 	falling_block.block_placed.connect(on_block_placed)
 	
+	mode = GameMode.TETRIS
 	turn_counter = MAX_TETRIS_TURN_COUNT
 
 func end_game():
@@ -197,7 +206,8 @@ func end_game():
 		get_tree().change_scene_to_packed(preload("res://highscore/high_score.tscn"))
 	else:
 		get_tree().change_scene_to_packed(preload("res://results/results.tscn"))
-	stop_game()
+		
+	mode = GameMode.TETRIS
 
 func get_score() -> int:
 	return score
@@ -225,7 +235,7 @@ func get_turn_counter() -> int:
 func get_random_weighted_letter() -> String:
 	var custom_weights = LETTER_FREQUENCIES
 	
-	var existence_discount_coefficient = 0.98
+	var existence_discount_coefficient = 1
 	for tile in grid.values():
 		if tile.solid:
 			var new_weight = custom_weights[tile.letter] * existence_discount_coefficient
@@ -304,6 +314,7 @@ func on_block_placed():
 	add_score(10, get_global_position_from_tile_pos(falling_block.tile_pos))
 	
 	var solid_row_streak = 0
+	var completed_rows = []
 	var block_rows = []
 	for offset in falling_block.block_tile_offsets:
 		var row = falling_block.tile_pos.y + offset.y
@@ -317,6 +328,7 @@ func on_block_placed():
 				break
 		if solid_row:
 			solid_row_streak += 1
+			completed_rows.append(row)
 		else:
 			if solid_row_streak == 1:
 				add_bomb(BombType.NORMAL)
@@ -331,6 +343,11 @@ func on_block_placed():
 				on_rows_finished(solid_row_streak, row - (solid_row_streak / 2) - 1)
 			solid_row_streak = 0
 			
+			for completed_row in completed_rows:
+				explode_at(get_global_position_from_tile_pos(Vector2i(0, completed_row)))
+				explode_at(get_global_position_from_tile_pos(Vector2i(GRID_WIDTH - 1, completed_row)))
+			completed_rows.clear()			
+			
 	if solid_row_streak == 1:
 		add_bomb(BombType.NORMAL)
 	elif solid_row_streak == 2:
@@ -341,7 +358,7 @@ func on_block_placed():
 		add_bomb(BombType.MASTER)
 
 	decrement_turn_counter()
-	if turn_counter > 0 and mode == GameMode.TETRIS:
+	if turn_counter > 0 and mode == GameMode.TETRIS and not game_over:
 		falling_block = block_spawner.spawn_random_block()
 		falling_block.block_placed.connect(on_block_placed)
 
@@ -367,6 +384,7 @@ func decrement_turn_counter():
 			selecting = false
 			selection_begin = Vector2.ZERO
 			selection_end = Vector2.ZERO
+			rounds += 1
 		
 		mode_changed.emit(mode)
 
@@ -619,3 +637,11 @@ func _physics_process(delta):
 	
 	if Input.is_action_just_released("selection"):
 		end_selection()
+		
+	if mode != GameMode.WORDSEARCH:
+		selecting = false
+		selection_begin = Vector2i.ZERO
+		selection_end = Vector2i.ZERO
+		bomb_placing = false
+		
+	tile_move_down_timer.wait_time = max(TILE_MOVE_DOWN_SECS - (0.05 * rounds), 0.2)

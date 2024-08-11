@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://textpops/text_pop.gd" id="1_nh2sd"]
 
 [node name="TextPop" type="Node2D"]
+z_index = 5
 script = ExtResource("1_nh2sd")
 
 [node name="Label" type="Label" parent="."]

@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://bsnxbblampjw8"]
+
+[ext_resource type="Texture2D" uid="uid://cctehwa8ujvmi" path="res://utils/fader_tex.png" id="1_woxau"]
+
+[node name="FaderLayer" type="CanvasLayer"]
+layer = 3
+
+[node name="Fader" type="Sprite2D" parent="."]
+texture = ExtResource("1_woxau")
+region_enabled = true
+region_rect = Rect2(0, 0, 2000, 2000)

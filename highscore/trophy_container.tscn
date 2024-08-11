@@ -1,0 +1,43 @@
+[gd_scene load_steps=9 format=3 uid="uid://d2psumaawm2l7"]
+
+[ext_resource type="Shader" path="res://utils/palette.gdshader" id="1_oophp"]
+[ext_resource type="PackedScene" uid="uid://dslgum44gqarh" path="res://highscore/letter_boom_trophy.fbx" id="1_uipvg"]
+[ext_resource type="Script" path="res://highscore/trophy_rotater.gd" id="2_qpr8n"]
+[ext_resource type="Texture2D" uid="uid://2313nqq5r2n0" path="res://utils/dawnbringer-32-1x.png" id="2_rvwct"]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_pqhay"]
+viewport_path = NodePath("SubViewport")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_3olqg"]
+resource_local_to_scene = true
+shader = ExtResource("1_oophp")
+shader_parameter/palette = ExtResource("2_rvwct")
+shader_parameter/tex = SubResource("ViewportTexture_pqhay")
+
+[sub_resource type="Environment" id="Environment_4ypb1"]
+ambient_light_source = 2
+ambient_light_color = Color(1, 1, 1, 1)
+ambient_light_energy = 0.47
+
+[sub_resource type="World3D" id="World3D_jq8gr"]
+environment = SubResource("Environment_4ypb1")
+
+[node name="TrophyContainer" type="Sprite2D"]
+material = SubResource("ShaderMaterial_3olqg")
+texture = SubResource("ViewportTexture_pqhay")
+
+[node name="SubViewport" type="SubViewport" parent="."]
+own_world_3d = true
+world_3d = SubResource("World3D_jq8gr")
+transparent_bg = true
+size = Vector2i(1024, 1024)
+
+[node name="Root Scene" parent="SubViewport" instance=ExtResource("1_uipvg")]
+transform = Transform3D(0.949588, 0.226887, 0.216343, -0.158356, 0.942721, -0.293599, -0.270565, 0.244539, 0.931126, 0, 0, -0.116351)
+script = ExtResource("2_qpr8n")
+
+[node name="Camera3D" type="Camera3D" parent="SubViewport"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17878, 3.54705)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="SubViewport"]
+transform = Transform3D(1, 0, 0, 0, 0.941465, -0.337112, 0, 0.337112, 0.941465, 0, 2.37574, 0)
