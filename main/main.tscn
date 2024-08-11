@@ -1,4 +1,4 @@
-[gd_scene load_steps=34 format=3 uid="uid://i1yrygt6eicc"]
+[gd_scene load_steps=36 format=3 uid="uid://i1yrygt6eicc"]
 
 [ext_resource type="PackedScene" uid="uid://djqq4ipexojpl" path="res://block/block.tscn" id="1_ar0ab"]
 [ext_resource type="Texture2D" uid="uid://bps3qkbq2wpw0" path="res://bg/tetris_bg.png" id="2_aomdg"]
@@ -20,12 +20,14 @@
 [ext_resource type="Script" path="res://grid/selection_display.gd" id="16_bbo1j"]
 [ext_resource type="Texture2D" uid="uid://evgm56wg5ua0" path="res://grid/x.png" id="17_c6rs2"]
 [ext_resource type="Script" path="res://grid/skip_word_search.gd" id="18_mg6el"]
-[ext_resource type="PackedScene" path="res://grid/bomb_slot.tscn" id="20_brpe1"]
+[ext_resource type="PackedScene" uid="uid://j5vy5ku43jo2" path="res://grid/bomb_slot.tscn" id="20_brpe1"]
 [ext_resource type="Texture2D" uid="uid://cpfmucd44ukna" path="res://grid/basic_bomb.png" id="21_tu23d"]
 [ext_resource type="Texture2D" uid="uid://1x6636j5nocq" path="res://grid/super_bomb.png" id="22_b0fk7"]
 [ext_resource type="Texture2D" uid="uid://d4dyywfa5jafi" path="res://grid/ultra_bomb.png" id="23_eqr6w"]
 [ext_resource type="Texture2D" uid="uid://cybgqde3reurd" path="res://grid/master_bomb.png" id="24_b5u6k"]
 [ext_resource type="Script" path="res://grid/cancel_bomb.gd" id="25_pklp7"]
+[ext_resource type="FontFile" uid="uid://dhma8mab6eilq" path="res://EBGaramond-Italic.ttf" id="27_033in"]
+[ext_resource type="Script" path="res://grid/score_display.gd" id="28_qehqg"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_q1spn"]
 atlas = ExtResource("8_xqimb")
@@ -59,9 +61,9 @@ region = Rect2(48, 0, 8, 8)
 
 [node name="BGLayer" type="CanvasLayer" parent="."]
 layer = 0
-follow_viewport_enabled = true
 
 [node name="BG" type="Sprite2D" parent="BGLayer"]
+position = Vector2(41, 5)
 texture = ExtResource("2_aomdg")
 region_enabled = true
 region_rect = Rect2(0, 0, 2000, 2000)
@@ -203,6 +205,28 @@ theme_override_fonts/font = ExtResource("15_2a34e")
 theme_override_font_sizes/font_size = 7
 text = "CANCEL BOMB"
 script = ExtResource("25_pklp7")
+
+[node name="ScoreDisplay" type="RichTextLabel" parent="GameplayLayer"]
+anchors_preset = -1
+anchor_left = 0.089375
+anchor_top = -0.0277778
+anchor_right = 0.410625
+anchor_bottom = 0.0277778
+offset_left = 31.0
+offset_right = 31.0
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_colors/default_color = Color(0.87451, 0.964706, 0.960784, 1)
+theme_override_constants/line_separation = -16
+theme_override_fonts/normal_font = ExtResource("27_033in")
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "[wave]Four-hundred thousand seven hundred and ten points"
+fit_content = true
+scroll_active = false
+script = ExtResource("28_qehqg")
+metadata/_edit_use_anchors_ = true
 
 [node name="GridMask" type="Sprite2D" parent="."]
 position = Vector2(27, -27)

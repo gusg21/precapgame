@@ -70,10 +70,13 @@ var bomb_count: Dictionary = {
 }
 var bomb_placing: bool = false
 var bomb_placing_type: BombType = BombType.NORMAL
+var score: int = 0
+
 
 signal tile_move_down
 signal grid_changed(tile_pos: Vector2i)
 signal mode_changed(mode: GameMode)
+signal score_changed(score: int)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -106,6 +109,14 @@ func _ready():
 	
 	turn_counter = MAX_TETRIS_TURN_COUNT
 	
+	
+func get_score() -> int:
+	return score
+	
+func add_score(points: int):
+	score += points
+	score_changed.emit(score)
+
 func get_turn_counter() -> int:
 	return turn_counter
 
@@ -175,6 +186,8 @@ func do_bomb_at(tile_pos: Vector2):
 func on_block_placed():
 	falling_block.block_placed.disconnect(on_block_placed)
 	last_down_press_time = 0 # "hack" to make sure next block doesn't come careening down
+	
+	add_score(10)
 	
 	var solid_row_streak = 0
 	var block_rows = []
