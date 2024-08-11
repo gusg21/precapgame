@@ -38,6 +38,14 @@ func play_quieter(sound):
 	player.play()
 	player.finished.connect(player.queue_free)
 
+func play_louder(sound):
+	var player = AudioStreamPlayer.new()
+	player.stream = sound
+	player.volume_db = linear_to_db(1.5)
+	add_child(player)
+	player.play()
+	player.finished.connect(player.queue_free)
+
 func play_random_pitched(sound):
 	var player = AudioStreamPlayer.new()
 	player.stream = sound

@@ -9,7 +9,7 @@
 [ext_resource type="Script" path="res://highscore/shuffle_button.gd" id="5_gg6q5"]
 [ext_resource type="Script" path="res://highscore/accept_button.gd" id="6_1rsa1"]
 [ext_resource type="PackedScene" uid="uid://b8sx184sb4rik" path="res://highscore/high_scores.tscn" id="7_aetc8"]
-[ext_resource type="PackedScene" uid="uid://d2psumaawm2l7" path="res://highscore/trophy_container.tscn" id="8_cdgce"]
+[ext_resource type="PackedScene" path="res://highscore/trophy_container.tscn" id="8_cdgce"]
 [ext_resource type="Texture2D" uid="uid://2313nqq5r2n0" path="res://utils/dawnbringer-32-1x.png" id="11_f3ytd"]
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_q4rnt"]

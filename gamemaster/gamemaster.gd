@@ -420,7 +420,7 @@ func decrement_turn_counter():
 			selection_end = Vector2.ZERO
 			rounds += 1
 		
-		AudioMan.play(preload("res://grid/modeSwitch.mp3"))
+		AudioMan.play_louder(preload("res://grid/modeSwitch.mp3"))
 		mode_changed.emit(mode)
 
 func skip_word_search():
@@ -429,6 +429,7 @@ func skip_word_search():
 	falling_block = block_spawner.spawn_random_block()
 	falling_block.block_placed.connect(on_block_placed)
 	
+	AudioMan.play_louder(preload("res://grid/modeSwitch.mp3"))
 	mode_changed.emit(mode)
 
 func get_mode() -> GameMode:
