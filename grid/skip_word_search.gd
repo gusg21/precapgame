@@ -1,7 +1,7 @@
 extends Button
 
 func _pressed():
-	Game.master.skip_word_search()
+	GameMaster.skip_word_search()
 	
 func _process(delta):
-	visible = Game.master.get_mode() == GameMaster.GameMode.WORDSEARCH and !Game.master.is_selecting() and !Game.master.is_bomb_placing()
+	visible = GameMaster.get_mode() == GameMaster.GameMode.WORDSEARCH and !GameMaster.is_selecting() and !GameMaster.is_bomb_placing()

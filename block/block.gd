@@ -19,10 +19,10 @@ func _ready():
 	block_tile_offsets = parse_block_tile_offsets_from_block_string(block_string)
 	
 	for offset in block_tile_offsets:
-		letter_offsets[offset] = Game.master.get_random_weighted_letter()
+		letter_offsets[offset] = GameMaster.get_random_weighted_letter()
 	generate_graphics(block_tile_offsets, letter_offsets)
 	
-	Game.master.tile_move_down.connect(on_tile_move_down)
+	GameMaster.tile_move_down.connect(on_tile_move_down)
 	
 	tile_pos = Vector2i(
 		GameMaster.GRID_WIDTH / 2,
@@ -55,7 +55,7 @@ func check_direction_solid(direction: Vector2i) -> bool:
 			## hit the bottom
 			#place_self()
 			
-		if Game.master.is_tile_solid(off_tile_pos + direction):
+		if GameMaster.is_tile_solid(off_tile_pos + direction):
 			return true
 			
 	return false
@@ -67,7 +67,7 @@ func check_offsets_solid(offsets: Array) -> bool:
 			## hit the bottom
 			#place_self()
 			
-		if Game.master.is_tile_solid(off_tile_pos):
+		if GameMaster.is_tile_solid(off_tile_pos):
 			return true
 			
 	return false
@@ -97,7 +97,7 @@ func set_block_texture(texture):
 	block_texture = texture
 
 func update_global_position():
-	global_position = Game.master.get_global_position_from_tile_pos(tile_pos)
+	global_position = GameMaster.get_global_position_from_tile_pos(tile_pos)
 	
 func on_tile_move_down():
 	try_move_down()
@@ -113,7 +113,7 @@ func generate_graphics(block_tile_offsets, letter_offsets):
 		
 	for letter_offset in letter_offsets.keys():
 		var letter_sprite = Sprite2D.new()
-		letter_sprite.texture = Game.master.get_letter_texture(letter_offsets[letter_offset])
+		letter_sprite.texture = GameMaster.get_letter_texture(letter_offsets[letter_offset])
 		letter_sprite.centered = false
 		letter_sprite.position = letter_offset * BLOCK_SIZE
 		add_child(letter_sprite)
@@ -151,7 +151,7 @@ func try_move_down():
 	if check_direction_solid(Vector2i.DOWN):
 		place_self()
 		if !moved:
-			Game.master.end_game()
+			GameMaster.end_game()
 		return
 	
 	tile_pos.y += 1
@@ -161,7 +161,7 @@ func try_move_down():
 func place_self():
 	for offset in block_tile_offsets:
 		var tile_pos = tile_pos + offset
-		Game.master.place_tile(tile_pos, {
+		GameMaster.place_tile(tile_pos, {
 			solid = true,
 			texture = block_texture,
 			letter = letter_offsets[offset]

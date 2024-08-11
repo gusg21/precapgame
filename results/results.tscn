@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://d25hkp11up3u3"]
+[gd_scene load_steps=8 format=3 uid="uid://d25hkp11up3u3"]
 
 [ext_resource type="Script" path="res://results/results.gd" id="1_jb1ku"]
 [ext_resource type="PackedScene" uid="uid://q4wsrr50kcwf" path="res://bg/bg.tscn" id="1_r8nlh"]
@@ -6,6 +6,7 @@
 [ext_resource type="FontFile" uid="uid://j56501frjq6j" path="res://Mystery Font.ttf" id="3_v3gx7"]
 [ext_resource type="FontFile" uid="uid://dhma8mab6eilq" path="res://EBGaramond-Italic.ttf" id="3_x3npj"]
 [ext_resource type="Script" path="res://results/again_button.gd" id="6_ab32o"]
+[ext_resource type="PackedScene" uid="uid://b8sx184sb4rik" path="res://highscore/high_scores.tscn" id="7_1oxn2"]
 
 [node name="Results" type="Node2D"]
 script = ExtResource("1_jb1ku")
@@ -60,3 +61,7 @@ theme_override_fonts/font = ExtResource("3_v3gx7")
 theme_override_font_sizes/font_size = 7
 text = "AGAIN AGAIN"
 script = ExtResource("6_ab32o")
+
+[node name="HighScores" parent="UILayer" instance=ExtResource("7_1oxn2")]
+position = Vector2(90, 123)
+show_your_score = false

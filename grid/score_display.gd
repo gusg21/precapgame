@@ -8,7 +8,7 @@ var visible_characters_float: float
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	Game.master.score_changed.connect(on_score_changed)
+	GameMaster.score_changed.connect(on_score_changed)
 	visible_characters_float = visible_characters
 	
 	text = "zero points"
@@ -26,7 +26,7 @@ func _process(delta):
 		visible_characters = floor(visible_characters_float)
 
 func on_score_changed(new_score):
-	var score = Game.master.get_score()
+	var score = GameMaster.get_score()
 	if score == 1:
 		target_text = NumberToWords.to_words(score) + " point"
 	else:

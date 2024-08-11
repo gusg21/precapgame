@@ -1,7 +1,5 @@
 extends Node
 
-class_name GameMaster
-
 enum GameMode {
 	TETRIS, WORDSEARCH
 }
@@ -75,6 +73,7 @@ var bomb_placing: bool = false
 var bomb_placing_type: BombType = BombType.NORMAL
 var score: int = 0
 var game_over = false
+var high_scores = []
 
 
 signal tile_move_down
@@ -85,10 +84,48 @@ signal bomb_count_update(bomb_type: BombType, count: int)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	if game_over:
-		return
+	print("initializing gamemaster")
 	
 	randomize()
+	
+	var high_score_file = FileAccess.open("user://data.boom", FileAccess.READ)
+	var load_default_scores = false
+	if high_score_file == null:
+		load_default_scores = true
+	else:
+		var high_scores_from_file = JSON.parse_string(high_score_file.get_as_text())
+		if high_scores_from_file == null:
+			load_default_scores = true
+		else:
+			if high_scores_from_file is Array:
+				high_scores = high_scores_from_file
+			else:
+				load_default_scores = true
+				
+	if load_default_scores:
+		high_scores = [
+			{
+				name = "GUS",
+				points = 5000
+			},
+			{
+				name = "SEA",
+				points = 4000
+			},
+			{
+				name = "XAV",
+				points = 3000
+			},
+			{
+				name = "DUC",
+				points = 2000
+			},
+			{
+				name = "DAV",
+				points = 0
+			},
+		]
+		save_high_scores()
 	
 	var words_file = FileAccess.open("res://utils/words_alpha.txt", FileAccess.READ)
 	words = words_file.get_as_text().split("\n")
@@ -96,6 +133,51 @@ func _ready():
 	for letter in LETTER_FREQUENCIES.keys():
 		LETTER_FREQUENCIES[letter] = pow(LETTER_FREQUENCIES[letter], 1.5)
 	
+	tile_move_down_timer = Timer.new()
+	tile_move_down_timer.wait_time = TILE_MOVE_DOWN_SECS
+	tile_move_down_timer.one_shot = false
+	tile_move_down_timer.timeout.connect(on_tile_move_down_timer_timeout)
+	add_child(tile_move_down_timer)
+
+func add_high_score(name: String, points: int):
+	var best_high_score_beaten = null
+	for high_score in high_scores:
+		if points > high_score.points:
+			if best_high_score_beaten != null:
+				if points > best_high_score_beaten.points:
+					best_high_score_beaten = high_score
+			else:
+				best_high_score_beaten = high_score
+	
+	if best_high_score_beaten != null:
+		high_scores.remove_at(high_scores.find(best_high_score_beaten))
+		high_scores.append({
+			name = name,
+			points = points
+		})
+	
+	save_high_scores()
+
+func save_high_scores():
+	var high_score_file = FileAccess.open("user://data.boom", FileAccess.WRITE)
+	high_score_file.store_string(JSON.stringify(high_scores))
+
+func is_high_score(score: int):
+	for high_score in high_scores:
+		if high_score.points < score:
+			return true
+			
+	return false
+
+func stop_game():
+	game_over = true
+
+func start_game():
+	game_over = false
+	
+	tile_move_down_timer.start()
+	
+	grid.clear()
 	for x in range(GRID_WIDTH):
 		for y in range(GRID_HEIGHT):
 			grid[Vector2i(x, y)] = {
@@ -105,28 +187,17 @@ func _ready():
 			}
 			grid_changed.emit(Vector2i(x, y))
 			
-	tile_move_down_timer = Timer.new()
-	tile_move_down_timer.wait_time = TILE_MOVE_DOWN_SECS
-	tile_move_down_timer.one_shot = false
-	tile_move_down_timer.timeout.connect(on_tile_move_down_timer_timeout)
-	add_child(tile_move_down_timer)
-	tile_move_down_timer.start()
-	
 	falling_block = block_spawner.spawn_random_block()
 	falling_block.block_placed.connect(on_block_placed)
 	
 	turn_counter = MAX_TETRIS_TURN_COUNT
-	
-
-func stop_game():
-	queue_free()
-	game_over = true
 
 func end_game():
-	get_tree().change_scene_to_packed(preload("res://bg/bg.tscn"))
+	if is_high_score(score):
+		get_tree().change_scene_to_packed(preload("res://highscore/high_score.tscn"))
+	else:
+		get_tree().change_scene_to_packed(preload("res://results/results.tscn"))
 	stop_game()
-	
-	
 
 func get_score() -> int:
 	return score
@@ -154,7 +225,7 @@ func get_turn_counter() -> int:
 func get_random_weighted_letter() -> String:
 	var custom_weights = LETTER_FREQUENCIES
 	
-	var existence_discount_coefficient = 0.9
+	var existence_discount_coefficient = 0.98
 	for tile in grid.values():
 		if tile.solid:
 			var new_weight = custom_weights[tile.letter] * existence_discount_coefficient
@@ -420,6 +491,9 @@ func destroy_selection():
 				grid_changed.emit(pos)
 
 func get_selected_words() -> Array[String]:
+	if grid.is_empty():
+		return ["",""]
+	
 	if selection_direction == Direction.VERTICAL:
 		var x = selection_begin.x
 		var top = min(selection_begin.y, selection_end.y)

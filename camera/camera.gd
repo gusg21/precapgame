@@ -7,7 +7,7 @@ var noise: FastNoiseLite
 
 # Called when the node enters the scene tree for the first time.
 func _enter_tree():
-	Game.master.camera = self
+	GameMaster.camera = self
 	noise = FastNoiseLite.new()
 	
 func shake(time):

@@ -7,7 +7,7 @@ var mouse_over: bool = false
 var old_count = 0
 
 func _ready():
-	Game.master.bomb_count_update.connect(on_bomb_count_update)
+	GameMaster.bomb_count_update.connect(on_bomb_count_update)
 	
 	$BasicBomb.texture = bomb_texture
 	
@@ -16,8 +16,8 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	var enabled = Game.master.get_mode() == GameMaster.GameMode.WORDSEARCH and !Game.master.is_bomb_placing() and \
-				  Game.master.get_bomb_count(bomb_type) > 0
+	var enabled = GameMaster.get_mode() == GameMaster.GameMode.WORDSEARCH and !GameMaster.is_bomb_placing() and \
+				  GameMaster.get_bomb_count(bomb_type) > 0
 	
 	$BasicBomb.modulate.a = 0.5 if !enabled else 1.0
 	if enabled:
@@ -34,14 +34,14 @@ func _process(delta):
 	$BombLabel.text = GameMaster.BombType.keys()[bomb_type]
 	
 	if Input.is_action_just_pressed("selection") and mouse_over and enabled:
-		Game.master.begin_bomb_placing(bomb_type)
+		GameMaster.begin_bomb_placing(bomb_type)
 
 func on_bomb_count_update(type: GameMaster.BombType, count: int):
 	if bomb_type == type:
 		if old_count != count:
 			var diff = count - old_count
 			if diff > 0:
-				Game.master.pop_at(str(diff), global_position)
+				GameMaster.pop_at(str(diff), global_position)
 		
 		$Count.text = str(count)
 		old_count = count

@@ -5,4 +5,4 @@ extends Control
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	visible = Game.master.get_mode() == enabled_mode
+	visible = GameMaster.get_mode() == enabled_mode

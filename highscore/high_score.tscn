@@ -1,0 +1,60 @@
+[gd_scene load_steps=8 format=3 uid="uid://62515tgyoo5u"]
+
+[ext_resource type="PackedScene" uid="uid://q4wsrr50kcwf" path="res://bg/bg.tscn" id="1_fl7g4"]
+[ext_resource type="FontFile" uid="uid://dhma8mab6eilq" path="res://EBGaramond-Italic.ttf" id="2_auon4"]
+[ext_resource type="FontFile" uid="uid://xgcrkiqotwku" path="res://EBGaramond-Regular.ttf" id="3_gqg20"]
+[ext_resource type="FontFile" uid="uid://j56501frjq6j" path="res://Mystery Font.ttf" id="4_is862"]
+[ext_resource type="Script" path="res://highscore/shuffle_button.gd" id="5_gg6q5"]
+[ext_resource type="Script" path="res://highscore/accept_button.gd" id="6_1rsa1"]
+[ext_resource type="PackedScene" uid="uid://b8sx184sb4rik" path="res://highscore/high_scores.tscn" id="7_aetc8"]
+
+[node name="HighScore" type="Node2D"]
+
+[node name="BG" parent="." instance=ExtResource("1_fl7g4")]
+
+[node name="Label" type="Label" parent="."]
+offset_left = 262.0
+offset_top = 70.0
+offset_right = 427.0
+offset_bottom = 103.0
+theme_override_fonts/font = ExtResource("2_auon4")
+theme_override_font_sizes/font_size = 24
+text = "Enter Your Name:"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Name" type="Label" parent="."]
+offset_left = 183.0
+offset_top = 95.0
+offset_right = 512.0
+offset_bottom = 159.0
+theme_override_fonts/font = ExtResource("3_gqg20")
+theme_override_font_sizes/font_size = 48
+text = "_ _ _"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ShuffleButton" type="Button" parent="."]
+offset_left = 301.0
+offset_top = 170.0
+offset_right = 394.0
+offset_bottom = 204.0
+theme_override_fonts/font = ExtResource("4_is862")
+theme_override_font_sizes/font_size = 7
+text = "SHUFFLE"
+script = ExtResource("5_gg6q5")
+name_label_path = NodePath("../Name")
+
+[node name="AcceptButton" type="Button" parent="."]
+offset_left = 301.0
+offset_top = 209.0
+offset_right = 394.0
+offset_bottom = 225.0
+theme_override_fonts/font = ExtResource("4_is862")
+theme_override_font_sizes/font_size = 7
+text = "ACCEPT"
+script = ExtResource("6_1rsa1")
+results_path = NodePath("../ShuffleButton")
+
+[node name="HighScores" parent="." instance=ExtResource("7_aetc8")]
+position = Vector2(118, 73)

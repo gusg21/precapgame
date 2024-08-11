@@ -1,4 +1,6 @@
 extends Node2D
 
+class_name Results
+
 func _enter_tree():
-	Game.master.stop_game()
+	GameMaster.stop_game()

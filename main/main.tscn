@@ -1,6 +1,7 @@
-[gd_scene load_steps=34 format=3 uid="uid://i1yrygt6eicc"]
+[gd_scene load_steps=35 format=3 uid="uid://i1yrygt6eicc"]
 
 [ext_resource type="PackedScene" uid="uid://djqq4ipexojpl" path="res://block/block.tscn" id="1_ar0ab"]
+[ext_resource type="Script" path="res://main/main.gd" id="1_sc881"]
 [ext_resource type="PackedScene" uid="uid://q4wsrr50kcwf" path="res://bg/bg.tscn" id="1_tegey"]
 [ext_resource type="Script" path="res://bg/bg_changer.gd" id="3_se670"]
 [ext_resource type="Script" path="res://camera/camera.gd" id="4_pej62"]
@@ -56,6 +57,7 @@ atlas = ExtResource("8_xqimb")
 region = Rect2(48, 0, 8, 8)
 
 [node name="Main" type="Node2D"]
+script = ExtResource("1_sc881")
 
 [node name="BGLayer" type="CanvasLayer" parent="."]
 layer = 0
@@ -244,5 +246,3 @@ script = ExtResource("27_rj4a4")
 [node name="GridMask" type="Sprite2D" parent="."]
 position = Vector2(27, -27)
 texture = ExtResource("5_h67gd")
-
-[node name="GameMaster" type="Node" parent="."]
