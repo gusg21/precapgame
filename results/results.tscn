@@ -1,0 +1,62 @@
+[gd_scene load_steps=7 format=3 uid="uid://d25hkp11up3u3"]
+
+[ext_resource type="Script" path="res://results/results.gd" id="1_jb1ku"]
+[ext_resource type="PackedScene" uid="uid://q4wsrr50kcwf" path="res://bg/bg.tscn" id="1_r8nlh"]
+[ext_resource type="FontFile" uid="uid://xgcrkiqotwku" path="res://EBGaramond-Regular.ttf" id="3_gt2o5"]
+[ext_resource type="FontFile" uid="uid://j56501frjq6j" path="res://Mystery Font.ttf" id="3_v3gx7"]
+[ext_resource type="FontFile" uid="uid://dhma8mab6eilq" path="res://EBGaramond-Italic.ttf" id="3_x3npj"]
+[ext_resource type="Script" path="res://results/again_button.gd" id="6_ab32o"]
+
+[node name="Results" type="Node2D"]
+script = ExtResource("1_jb1ku")
+
+[node name="BGLayer" type="CanvasLayer" parent="."]
+
+[node name="BG" parent="BGLayer" instance=ExtResource("1_r8nlh")]
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+
+[node name="Label3" type="Label" parent="UILayer"]
+offset_left = -19.0
+offset_top = 15.0
+offset_right = 191.0
+offset_bottom = 48.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.4)
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("3_gt2o5")
+theme_override_font_sizes/font_size = 24
+text = "Game Over"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label" type="Label" parent="UILayer"]
+offset_left = 385.0
+offset_top = 202.0
+offset_right = 564.0
+offset_bottom = 235.0
+theme_override_fonts/font = ExtResource("3_x3npj")
+theme_override_font_sizes/font_size = 16
+text = "Thanks for playing!"
+
+[node name="Label2" type="Label" parent="UILayer"]
+offset_left = 238.0
+offset_top = 224.0
+offset_right = 523.0
+offset_bottom = 296.0
+theme_override_colors/font_color = Color(0.58, 0.58, 0.58, 1)
+theme_override_fonts/font = ExtResource("3_x3npj")
+theme_override_font_sizes/font_size = 16
+text = "Game created by Angus Goucher in 48 hours
+Special Thanks to Xavier Olmstead, CJ Spanier, 
+  and Elijah Polyakov"
+horizontal_alignment = 2
+
+[node name="Button" type="Button" parent="UILayer"]
+offset_left = 37.0
+offset_top = 65.0
+offset_right = 138.0
+offset_bottom = 108.0
+theme_override_fonts/font = ExtResource("3_v3gx7")
+theme_override_font_sizes/font_size = 7
+text = "AGAIN AGAIN"
+script = ExtResource("6_ab32o")

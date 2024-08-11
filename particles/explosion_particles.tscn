@@ -1,0 +1,40 @@
+[gd_scene load_steps=6 format=3 uid="uid://f8c7gddhfxw4"]
+
+[ext_resource type="Texture2D" uid="uid://ca44nh34bgcmk" path="res://particles/particle.png" id="1_y5rx5"]
+
+[sub_resource type="Curve" id="Curve_b8e3n"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.257062, 1), 0.0563137, 0.0563137, 0, 0, Vector2(1, 0), -1.79705, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="Gradient" id="Gradient_62u5o"]
+offsets = PackedFloat32Array(0, 0.610429, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0.6, 0.490196, 0.364706, 1, 0.368627, 0.2, 0, 0)
+
+[sub_resource type="Gradient" id="Gradient_h4tyg"]
+colors = PackedColorArray(0.85, 0.561, 0.561, 1, 1, 1, 1, 1)
+
+[sub_resource type="Curve" id="Curve_qweun"]
+min_value = -1.0
+_data = [Vector2(0, -1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[node name="ExplosionParticles" type="CPUParticles2D"]
+emitting = false
+amount = 20
+one_shot = true
+explosiveness = 0.9
+texture = ExtResource("1_y5rx5")
+emission_shape = 3
+emission_rect_extents = Vector2(8, 8)
+spread = 180.0
+gravity = Vector2(0, 100)
+initial_velocity_min = 50.0
+initial_velocity_max = 90.0
+damping_min = 100.0
+damping_max = 100.0
+scale_amount_curve = SubResource("Curve_b8e3n")
+color = Color(1, 0.24, 0.24, 1)
+color_ramp = SubResource("Gradient_62u5o")
+color_initial_ramp = SubResource("Gradient_h4tyg")
+hue_variation_max = 1.0
+hue_variation_curve = SubResource("Curve_qweun")

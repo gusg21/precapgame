@@ -1,5 +1,7 @@
 extends Node
 
+class_name GameMaster
+
 enum GameMode {
 	TETRIS, WORDSEARCH
 }
@@ -16,7 +18,7 @@ const GRID_WIDTH = 10
 const GRID_HEIGHT = 20
 const TILE_MOVE_DOWN_SECS: float = 1
 const MAX_TETRIS_TURN_COUNT = 5
-const MAX_WORDSEARCH_TURN_COUNT = 5
+const MAX_WORDSEARCH_TURN_COUNT = 3
 
 var LETTER_FREQUENCIES: Dictionary = {
 	"A" = 7.8,
@@ -50,6 +52,7 @@ var LETTER_FREQUENCIES: Dictionary = {
 var grid_object: Grid
 var block_spawner: BlockSpawner
 var camera: Camera
+var text_pop_host: Node2D
 
 var grid: Dictionary
 var tile_move_down_timer: Timer # block move down timer. bad name :(
@@ -62,24 +65,29 @@ var selection_begin: Vector2i = Vector2i.ZERO
 var selection_end: Vector2i = Vector2i.ZERO
 var selection_direction: Direction = Direction.VERTICAL
 var words: Array = []
-var bomb_count: Dictionary = {
-	BombType.NORMAL: 3,
-	BombType.SUPER: 3,
-	BombType.ULTRA: 3,
-	BombType.MASTER: 3
+var _bomb_count: Dictionary = {
+	BombType.NORMAL: 0,
+	BombType.SUPER: 0,
+	BombType.ULTRA: 0,
+	BombType.MASTER: 0
 }
 var bomb_placing: bool = false
 var bomb_placing_type: BombType = BombType.NORMAL
 var score: int = 0
+var game_over = false
 
 
 signal tile_move_down
 signal grid_changed(tile_pos: Vector2i)
 signal mode_changed(mode: GameMode)
 signal score_changed(score: int)
+signal bomb_count_update(bomb_type: BombType, count: int)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	if game_over:
+		return
+	
 	randomize()
 	
 	var words_file = FileAccess.open("res://utils/words_alpha.txt", FileAccess.READ)
@@ -109,13 +117,36 @@ func _ready():
 	
 	turn_counter = MAX_TETRIS_TURN_COUNT
 	
+
+func stop_game():
+	queue_free()
+	game_over = true
+
+func end_game():
+	get_tree().change_scene_to_packed(preload("res://bg/bg.tscn"))
+	stop_game()
 	
+	
+
 func get_score() -> int:
 	return score
 	
-func add_score(points: int):
+func add_score(points: int, where: Vector2 = Vector2.INF):
 	score += points
 	score_changed.emit(score)
+	pop_at(str(points), where)
+
+func pop_at(text: String, where: Vector2):
+	var pop = preload("res://textpops/text_pop.tscn").instantiate()
+	pop.set_text(text)
+	pop.global_position = where
+	text_pop_host.add_child(pop)
+	
+func explode_at(where: Vector2):
+	var particles = preload("res://particles/explosion_particles.tscn").instantiate()
+	particles.emitting = true
+	particles.global_position = where
+	text_pop_host.add_child(particles)
 
 func get_turn_counter() -> int:
 	return turn_counter
@@ -177,17 +208,29 @@ func do_bomb_at(tile_pos: Vector2):
 				letter = null
 			}
 			grid_changed.emit(pos)
+			explode_at(get_global_position_from_tile_pos(pos))
 	
 	camera.shake(0.1 * size)
 	
-	bomb_count[bomb_placing_type] -= 1
+	take_bomb(bomb_placing_type)
 	bomb_placing = false
+	
+func take_bomb(type):
+	_bomb_count[type] -= 1
+	bomb_count_update.emit(type, _bomb_count[type])
+	
+func add_bomb(type):
+	_bomb_count[type] += 1
+	bomb_count_update.emit(type, _bomb_count[type])
+
+func get_bomb_count(type):
+	return _bomb_count[type]
 
 func on_block_placed():
 	falling_block.block_placed.disconnect(on_block_placed)
 	last_down_press_time = 0 # "hack" to make sure next block doesn't come careening down
 	
-	add_score(10)
+	add_score(10, get_global_position_from_tile_pos(falling_block.tile_pos))
 	
 	var solid_row_streak = 0
 	var block_rows = []
@@ -205,30 +248,35 @@ func on_block_placed():
 			solid_row_streak += 1
 		else:
 			if solid_row_streak == 1:
-				bomb_count[BombType.NORMAL] += 1
+				add_bomb(BombType.NORMAL)
 			elif solid_row_streak == 2:
-				bomb_count[BombType.SUPER] += 1
+				add_bomb(BombType.SUPER)
 			elif solid_row_streak == 3:
-				bomb_count[BombType.ULTRA] += 1
+				add_bomb(BombType.ULTRA)
 			elif solid_row_streak == 4:
-				bomb_count[BombType.MASTER] += 1
+				add_bomb(BombType.MASTER)
 			
+			if solid_row_streak > 0:
+				on_rows_finished(solid_row_streak, row - (solid_row_streak / 2) - 1)
 			solid_row_streak = 0
 			
 	if solid_row_streak == 1:
-		bomb_count[BombType.NORMAL] += 1
+		add_bomb(BombType.NORMAL)
 	elif solid_row_streak == 2:
-		bomb_count[BombType.SUPER] += 1
+		add_bomb(BombType.SUPER)
 	elif solid_row_streak == 3:
-		bomb_count[BombType.ULTRA] += 1
+		add_bomb(BombType.ULTRA)
 	elif solid_row_streak == 4:
-		bomb_count[BombType.MASTER] += 1
+		add_bomb(BombType.MASTER)
 
 	decrement_turn_counter()
 	if turn_counter > 0 and mode == GameMode.TETRIS:
 		falling_block = block_spawner.spawn_random_block()
 		falling_block.block_placed.connect(on_block_placed)
-	
+
+func on_rows_finished(count: int, middle_row_tile_y: int):
+	add_score(count * 500, get_global_position_from_tile_pos(Vector2i(GRID_WIDTH / 2, middle_row_tile_y)))
+
 func decrement_turn_counter():
 	turn_counter -= 1
 	
@@ -236,6 +284,9 @@ func decrement_turn_counter():
 		if mode == GameMode.TETRIS:
 			mode = GameMode.WORDSEARCH
 			turn_counter = MAX_WORDSEARCH_TURN_COUNT
+			selecting = false
+			selection_begin = Vector2i.ZERO
+			selection_end = Vector2i.ZERO
 		else:
 			mode = GameMode.TETRIS
 			turn_counter = MAX_TETRIS_TURN_COUNT
@@ -292,8 +343,24 @@ func end_selection():
 	if is_word(selected_words[0]) or is_word(selected_words[1]):
 		destroy_selection()
 		camera.shake(0.5)
-		grid_changed.emit()
 		decrement_turn_counter()
+		var word_length = selected_words[0].length()
+		var score = 0
+		if word_length == 3:
+			score = 50
+		if word_length == 4:
+			score = 150
+		if word_length == 5:
+			score = 400
+		if word_length == 6:
+			score = 1000
+		if word_length == 7:
+			score = 3000
+		if word_length == 8:
+			score = 10000
+		if word_length >= 9:
+			score = pow(20000, word_length - 8)
+		add_score(score, get_global_position_from_tile_pos(selection_begin))
 	
 	selecting = false
 	selection_begin = Vector2i.ZERO
@@ -315,6 +382,7 @@ func destroy_selection():
 					texture = null,
 					letter = null
 				}
+				explode_at(get_global_position_from_tile_pos(pos))
 				grid_changed.emit(pos)
 	elif selection_direction == Direction.HORIZONTAL:
 		var y = selection_begin.y
@@ -331,6 +399,7 @@ func destroy_selection():
 					texture = null,
 					letter = null
 				}
+				explode_at(get_global_position_from_tile_pos(pos))
 				grid_changed.emit(pos)
 	elif selection_direction == Direction.DIAGONAL:
 		var diff = selection_end - selection_begin
@@ -347,6 +416,7 @@ func destroy_selection():
 					texture = null,
 					letter = null
 				}
+				explode_at(get_global_position_from_tile_pos(pos))
 				grid_changed.emit(pos)
 
 func get_selected_words() -> Array[String]:

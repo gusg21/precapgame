@@ -10,5 +10,5 @@ func _ready():
 	bg = get_node(bg_node_path)
 	
 func _process(delta):
-	bg.direction.x = 1 if GameMaster.get_mode() == GameMaster.GameMode.TETRIS else -1
-	bg.texture = tetris_tex if GameMaster.get_mode() == GameMaster.GameMode.TETRIS else word_tex
+	bg.direction.x = 1 if Game.master.get_mode() == GameMaster.GameMode.TETRIS else -1
+	bg.texture = tetris_tex if Game.master.get_mode() == GameMaster.GameMode.TETRIS else word_tex

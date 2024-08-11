@@ -1,16 +1,13 @@
-[gd_scene load_steps=36 format=3 uid="uid://i1yrygt6eicc"]
+[gd_scene load_steps=34 format=3 uid="uid://i1yrygt6eicc"]
 
 [ext_resource type="PackedScene" uid="uid://djqq4ipexojpl" path="res://block/block.tscn" id="1_ar0ab"]
-[ext_resource type="Texture2D" uid="uid://bps3qkbq2wpw0" path="res://bg/tetris_bg.png" id="2_aomdg"]
-[ext_resource type="Script" path="res://utils/scroller.gd" id="3_cdk7q"]
+[ext_resource type="PackedScene" uid="uid://q4wsrr50kcwf" path="res://bg/bg.tscn" id="1_tegey"]
 [ext_resource type="Script" path="res://bg/bg_changer.gd" id="3_se670"]
 [ext_resource type="Script" path="res://camera/camera.gd" id="4_pej62"]
 [ext_resource type="Script" path="res://grid/grid.gd" id="4_sxwvi"]
 [ext_resource type="Texture2D" uid="uid://cd71717iixwi8" path="res://grid/empty_grid_tile.png" id="5_ffhhw"]
 [ext_resource type="Texture2D" uid="uid://c1sftvosnx2m3" path="res://grid/grid_mask.png" id="5_h67gd"]
 [ext_resource type="PackedScene" uid="uid://dmci70rf5h6p" path="res://grid/grid_bg.tscn" id="6_8xisf"]
-[ext_resource type="Texture2D" uid="uid://emok5lfp0ka1" path="res://grid/tetris_text.png" id="6_iu31q"]
-[ext_resource type="Texture2D" uid="uid://bqkgbxlg8n45s" path="res://grid/wordsearch_text.png" id="7_6wuwf"]
 [ext_resource type="Script" path="res://grid/grid_text.gd" id="7_df5je"]
 [ext_resource type="Script" path="res://blockspawner/block_spawner.gd" id="7_qjl1v"]
 [ext_resource type="Texture2D" uid="uid://ddto2bhydudnw" path="res://block/tiles.png" id="8_xqimb"]
@@ -20,13 +17,14 @@
 [ext_resource type="Script" path="res://grid/selection_display.gd" id="16_bbo1j"]
 [ext_resource type="Texture2D" uid="uid://evgm56wg5ua0" path="res://grid/x.png" id="17_c6rs2"]
 [ext_resource type="Script" path="res://grid/skip_word_search.gd" id="18_mg6el"]
-[ext_resource type="PackedScene" uid="uid://j5vy5ku43jo2" path="res://grid/bomb_slot.tscn" id="20_brpe1"]
+[ext_resource type="PackedScene" path="res://grid/bomb_slot.tscn" id="20_brpe1"]
 [ext_resource type="Texture2D" uid="uid://cpfmucd44ukna" path="res://grid/basic_bomb.png" id="21_tu23d"]
 [ext_resource type="Texture2D" uid="uid://1x6636j5nocq" path="res://grid/super_bomb.png" id="22_b0fk7"]
 [ext_resource type="Texture2D" uid="uid://d4dyywfa5jafi" path="res://grid/ultra_bomb.png" id="23_eqr6w"]
 [ext_resource type="Texture2D" uid="uid://cybgqde3reurd" path="res://grid/master_bomb.png" id="24_b5u6k"]
 [ext_resource type="Script" path="res://grid/cancel_bomb.gd" id="25_pklp7"]
 [ext_resource type="FontFile" uid="uid://dhma8mab6eilq" path="res://EBGaramond-Italic.ttf" id="27_033in"]
+[ext_resource type="Script" path="res://textpops/text_pop_host.gd" id="27_rj4a4"]
 [ext_resource type="Script" path="res://grid/score_display.gd" id="28_qehqg"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_q1spn"]
@@ -62,13 +60,7 @@ region = Rect2(48, 0, 8, 8)
 [node name="BGLayer" type="CanvasLayer" parent="."]
 layer = 0
 
-[node name="BG" type="Sprite2D" parent="BGLayer"]
-position = Vector2(41, 5)
-texture = ExtResource("2_aomdg")
-region_enabled = true
-region_rect = Rect2(0, 0, 2000, 2000)
-script = ExtResource("3_cdk7q")
-speed = 4.0
+[node name="BG" parent="BGLayer" instance=ExtResource("1_tegey")]
 
 [node name="BGChanger" type="Node2D" parent="BGLayer"]
 script = ExtResource("3_se670")
@@ -92,14 +84,32 @@ clip_children = 1
 z_index = 3
 texture = ExtResource("5_h67gd")
 
-[node name="TetrisText" type="Sprite2D" parent="GameplayLayer"]
-position = Vector2(3, 116)
-texture = ExtResource("6_iu31q")
+[node name="TetrisText" type="Label" parent="GameplayLayer"]
+modulate = Color(1, 1, 1, 0.368627)
+offset_left = -25.0
+offset_top = 83.0
+offset_right = 26.0
+offset_bottom = 116.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("27_033in")
+theme_override_font_sizes/font_size = 16
+text = "Tetris"
+horizontal_alignment = 1
+vertical_alignment = 1
 script = ExtResource("7_df5je")
 
-[node name="WordsearchText" type="Sprite2D" parent="GameplayLayer"]
-position = Vector2(2, -113)
-texture = ExtResource("7_6wuwf")
+[node name="WordsearchText" type="Label" parent="GameplayLayer"]
+modulate = Color(1, 1, 1, 0.368627)
+offset_left = -56.0
+offset_top = -112.0
+offset_right = 60.0
+offset_bottom = -79.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("27_033in")
+theme_override_font_sizes/font_size = 16
+text = "Word Search"
+horizontal_alignment = 1
+vertical_alignment = 1
 script = ExtResource("7_df5je")
 enabled_mode = 1
 
@@ -228,6 +238,11 @@ scroll_active = false
 script = ExtResource("28_qehqg")
 metadata/_edit_use_anchors_ = true
 
+[node name="TextPopHost" type="Node2D" parent="GameplayLayer"]
+script = ExtResource("27_rj4a4")
+
 [node name="GridMask" type="Sprite2D" parent="."]
 position = Vector2(27, -27)
 texture = ExtResource("5_h67gd")
+
+[node name="GameMaster" type="Node" parent="."]

@@ -12,9 +12,9 @@ var selection_areas: Dictionary = {}
 
 
 func _enter_tree():
-	GameMaster.grid_object = self
-	GameMaster.grid_changed.connect(on_grid_changed)
-	GameMaster.mode_changed.connect(on_mode_changed)
+	Game.master.grid_object = self
+	Game.master.grid_changed.connect(on_grid_changed)
+	Game.master.mode_changed.connect(on_mode_changed)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -63,13 +63,13 @@ func _ready():
 
 func on_grid_changed(tile_pos: Vector2i):
 	if tile_pos in tiles.keys():
-		var tile_data = GameMaster.get_tile_at(tile_pos)
+		var tile_data = Game.master.get_tile_at(tile_pos)
 		if !tile_data.solid or tile_data.texture == null:
 			tiles[tile_pos].texture = empty_grid_tile_tex
 		else:
 			tiles[tile_pos].texture = tile_data.texture
 		if tile_data.letter != null:
-			letter_tiles[tile_pos].texture = GameMaster.get_letter_texture(tile_data.letter)
+			letter_tiles[tile_pos].texture = Game.master.get_letter_texture(tile_data.letter)
 		else:
 			letter_tiles[tile_pos].texture = null
 
@@ -81,12 +81,12 @@ func on_mode_changed(mode: GameMaster.GameMode):
 
 func enable_color():
 	for tile_pos in tiles.keys():
-		var tile_data = GameMaster.get_tile_at(tile_pos)
+		var tile_data = Game.master.get_tile_at(tile_pos)
 		tiles[tile_pos].texture = tile_data.texture if tile_data.texture != null else empty_grid_tile_tex
 
 func disable_color():
 	for tile_pos in tiles.keys():
-		var tile_data = GameMaster.get_tile_at(tile_pos)
+		var tile_data = Game.master.get_tile_at(tile_pos)
 		if tile_data.solid:
 			tiles[tile_pos].texture = preload("res://grid/white_tile.png")
 

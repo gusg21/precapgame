@@ -7,7 +7,7 @@ class_name BlockSpawner
 @export var block_textures: Array[Texture2D]
 
 func _enter_tree():
-	GameMaster.block_spawner = self
+	Game.master.block_spawner = self
 
 func spawn_random_block():
 	var new_block = block_scene.instantiate()
