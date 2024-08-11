@@ -27,6 +27,7 @@ func _ready():
 				x - GameMaster.GRID_WIDTH / 2, 
 				y - GameMaster.GRID_HEIGHT / 2
 				) * grid_spacing
+			grid_tile.z_index = 0
 			add_child(grid_tile)
 			tiles[Vector2i(x, y)] = grid_tile
 			
@@ -37,6 +38,7 @@ func _ready():
 				x - GameMaster.GRID_WIDTH / 2, 
 				y - GameMaster.GRID_HEIGHT / 2
 				) * grid_spacing
+			letter_tile.z_index = 0
 			add_child(letter_tile)
 			letter_tiles[Vector2i(x, y)] = letter_tile
 			
@@ -46,7 +48,7 @@ func _ready():
 				y - GameMaster.GRID_HEIGHT / 2
 				) * grid_spacing
 			selection_area.tile_pos = Vector2i(x, y)
-			add_child(selection_area)
+			$SelectionAreaClipper.add_child(selection_area)
 			selection_areas[Vector2i(x, y)] = selection_area
 			
 	var bg = grid_bg_scene.instantiate()

@@ -20,7 +20,7 @@
 [ext_resource type="Script" path="res://grid/selection_display.gd" id="16_bbo1j"]
 [ext_resource type="Texture2D" uid="uid://evgm56wg5ua0" path="res://grid/x.png" id="17_c6rs2"]
 [ext_resource type="Script" path="res://grid/skip_word_search.gd" id="18_mg6el"]
-[ext_resource type="PackedScene" uid="uid://j5vy5ku43jo2" path="res://grid/bomb_slot.tscn" id="20_brpe1"]
+[ext_resource type="PackedScene" path="res://grid/bomb_slot.tscn" id="20_brpe1"]
 [ext_resource type="Texture2D" uid="uid://cpfmucd44ukna" path="res://grid/basic_bomb.png" id="21_tu23d"]
 [ext_resource type="Texture2D" uid="uid://1x6636j5nocq" path="res://grid/super_bomb.png" id="22_b0fk7"]
 [ext_resource type="Texture2D" uid="uid://d4dyywfa5jafi" path="res://grid/ultra_bomb.png" id="23_eqr6w"]
@@ -78,13 +78,17 @@ follow_viewport_enabled = true
 [node name="Camera2D" type="Camera2D" parent="GameplayLayer"]
 script = ExtResource("4_pej62")
 
-[node name="Grid" type="Sprite2D" parent="GameplayLayer"]
+[node name="Grid" type="Node2D" parent="GameplayLayer"]
 clip_children = 1
 z_index = -1
-texture = ExtResource("5_h67gd")
 script = ExtResource("4_sxwvi")
 empty_grid_tile_tex = ExtResource("5_ffhhw")
 grid_bg_scene = ExtResource("6_8xisf")
+
+[node name="SelectionAreaClipper" type="Sprite2D" parent="GameplayLayer/Grid"]
+clip_children = 1
+z_index = 3
+texture = ExtResource("5_h67gd")
 
 [node name="TetrisText" type="Sprite2D" parent="GameplayLayer"]
 position = Vector2(3, 116)

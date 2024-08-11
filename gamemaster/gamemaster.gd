@@ -110,6 +110,14 @@ func get_turn_counter() -> int:
 	return turn_counter
 
 func get_random_weighted_letter() -> String:
+	var custom_weights = LETTER_FREQUENCIES
+	
+	var existence_discount_coefficient = 0.9
+	for tile in grid.values():
+		if tile.solid:
+			var new_weight = custom_weights[tile.letter] * existence_discount_coefficient
+			custom_weights[tile.letter] = max(new_weight, 0)
+	
 	var weight_sum = 0 
 	for weight in LETTER_FREQUENCIES.values():
 		weight_sum += weight
