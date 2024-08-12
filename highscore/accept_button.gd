@@ -11,5 +11,7 @@ func _process(delta):
 
 func _pressed():
 	AudioMan.play(preload("res://utils/button_pressed.mp3"))
+	if GameMaster.is_word(results.get_new_name()):
+		GameMaster.add_score(100)
 	GameMaster.add_high_score(results.get_new_name(), GameMaster.get_score())
 	$"../..".unreveal()

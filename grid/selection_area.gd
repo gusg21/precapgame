@@ -19,8 +19,7 @@ func _on_area_2d_mouse_entered():
 
 
 func _on_area_2d_mouse_exited():
-	if GameMaster.get_mode() == GameMaster.GameMode.WORDSEARCH:
-		mouse_over = false
+	mouse_over = false
 
 func can_click():
 	return GameMaster.get_mode() == GameMaster.GameMode.WORDSEARCH

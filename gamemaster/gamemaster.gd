@@ -51,6 +51,7 @@ var grid_object: Grid
 var block_spawner: BlockSpawner
 var camera: Camera
 var text_pop_host: Node2D
+var effect: Effect
 
 var grid: Dictionary
 var tile_move_down_timer: Timer # block move down timer. bad name :(
@@ -71,7 +72,7 @@ var _bomb_count: Dictionary = {
 }
 var bomb_placing: bool = false
 var bomb_placing_type: BombType = BombType.NORMAL
-var score: int = 190000
+var score: int = 0
 var game_over = false
 var high_scores = []
 var rounds = 0
@@ -292,6 +293,7 @@ func do_bomb_at(tile_pos: Vector2):
 			explode_at(get_global_position_from_tile_pos(pos))
 	
 	camera.shake(0.1 * size)
+	effect.pow()
 	
 	if bomb_placing_type == BombType.NORMAL:
 		AudioMan.play(preload("res://grid/bombExplode0.mp3"))		
@@ -409,28 +411,26 @@ func decrement_turn_counter():
 			selecting = false
 			selection_begin = Vector2i.ZERO
 			selection_end = Vector2i.ZERO
+			mode_changed.emit(mode)
 		else:
-			mode = GameMode.TETRIS
-			turn_counter = MAX_TETRIS_TURN_COUNT
-			falling_block = block_spawner.spawn_random_block()
-			falling_block.block_placed.connect(on_block_placed)
-			
-			selecting = false
-			selection_begin = Vector2.ZERO
-			selection_end = Vector2.ZERO
-			rounds += 1
+			end_word_search()
 		
 		AudioMan.play_louder(preload("res://grid/modeSwitch.mp3"))
-		mode_changed.emit(mode)
 
-func skip_word_search():
+func end_word_search():
 	mode = GameMode.TETRIS
+	
+	mode_changed.emit(mode)
+	
 	turn_counter = MAX_TETRIS_TURN_COUNT
 	falling_block = block_spawner.spawn_random_block()
 	falling_block.block_placed.connect(on_block_placed)
 	
-	AudioMan.play_louder(preload("res://grid/modeSwitch.mp3"))
-	mode_changed.emit(mode)
+	selecting = false
+	selection_begin = Vector2.ZERO
+	selection_end = Vector2.ZERO
+	
+	rounds += 1
 
 func get_mode() -> GameMode:
 	return mode
